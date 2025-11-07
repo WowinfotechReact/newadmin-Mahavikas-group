@@ -5,6 +5,8 @@ import { AddUpdateProductApi, GetProductModel } from 'services/Product/ProductAp
 import { ConfigContext } from 'context/ConfigContext';
 import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import DatePicker from 'react-date-picker';
+import Select from 'react-select';
+
 import 'react-calendar/dist/Calendar.css';
 import 'react-date-picker/dist/DatePicker.css';
 
@@ -115,7 +117,11 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
       console.error('Error in product: ', error);
     }
   };
-
+  const serviceOption = [
+    { value: '1', label: 'MTS' },
+    { value: '2', label: 'Teaching' },
+    { value: '3', label: 'Nursing' },
+  ]
   return (
     <>
       <Modal size="md" show={show} style={{ zIndex: 1300 }} onHide={onHide} backdrop="static" keyboard={false} centered>
@@ -186,33 +192,45 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
                 />
               </div>
 
+              <div className="mb-3">
+                <label htmlFor="ProductName" className="form-label">
+                  Select Services<span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select options={serviceOption} placeholder='Select Services' />
+                {error && !productObj.productName && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
+                {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
+              </div>
+
               {/* GST Percentage */}
-              <div className="mb-3">
-                <label htmlFor="GstPercentage" className="form-label">
-                  Start Date
-                </label>
-                <DatePicker
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="startDate" className="form-label">
+                    Start Date
+                  </label>
+                  <DatePicker
+                    id="startDate"
+                    label="From Date"
+                    format="dd/MM/yyyy"
+                    clearIcon={null}
+                    popperPlacement="bottom-start"
+                  />
+                </div>
 
-
-                  label="From Date"
-                  format="dd/MM/yyyy"
-                  clearIcon={null}
-                  popperPlacement="bottom-start"
-                />
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="endDate" className="form-label">
+                    End Date
+                  </label>
+                  <DatePicker
+                    id="endDate"
+                    label="To Date"
+                    format="dd/MM/yyyy"
+                    clearIcon={null}
+                    popperPlacement="bottom-start"
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="GstPercentage" className="form-label">
-                  End Date
-                </label>
-                <DatePicker
 
 
-                  label="From Date"
-                  format="dd/MM/yyyy"
-                  clearIcon={null}
-                  popperPlacement="bottom-start"
-                />
-              </div>
             </div>
           </div>
         </Modal.Body>

@@ -1,6 +1,7 @@
 
 import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
@@ -97,6 +98,7 @@ const icons = {
   BlockOutlinedIcon: BlockOutlinedIcon,
   AppsOutlinedIcon: AppsOutlinedIcon,
   SummarizeIcon: SummarizeIcon,
+  AssessmentIcon: AssessmentIcon,
   ContactSupportOutlinedIcon: ContactSupportOutlinedIcon,
   KeyboardCommandKeyIcon: KeyboardCommandKeyIcon,
   LocalShippingIcon: LocalShippingIcon,
@@ -205,7 +207,7 @@ export default {
           type: 'collapse',
           moduleName: 'Customer',
 
-          icon: icons['FolderOutlinedIcon'],
+          icon: icons['AssessmentIcon'],
           children: [
             {
               id: 'Master',

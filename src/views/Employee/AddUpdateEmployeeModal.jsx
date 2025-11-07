@@ -438,7 +438,11 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       console.error('Error fetching role type lookup list:', error);
     }
   };
-
+  const companyOption = [
+    { value: 'Company 1', label: 'Company 1' },
+    { value: 'Company 2', label: 'Company 2' },
+    { value: 'Company 3', label: 'Both' },
+  ]
 
   return (
     <>
@@ -616,36 +620,25 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                   </div>
                 </div>
               </div>
-
               <div className="col-12 col-md-6 mb-2">
                 <div>
-                  <label htmlFor="vehicleNumber" className="form-label">
-                    Address
+                  <label className="form-label">
+                    Select Company
                     <span style={{ color: 'red' }}>*</span>
                   </label>
-                  <textarea
-                    className="form-control"
-                    placeholder="Enter Address"
-                    maxLength={250}
-                    value={employeeObj.address}
-                    onChange={(e) => {
-                      setErrorMessage(false);
-                      let InputValue = e.target.value;
-                      // Updated regex to allow common special characters for addresses
-                      const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
-                      setEmployeeObj((prev) => ({
-                        ...prev,
-                        address: updatedValue
-                      }));
-                    }}
-                  />
-                  {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
-                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                  ) : (
-                    ''
-                  )}
+                  <div>
+                    <Select options={companyOption} placeholder='Select Company' />
+                    {error &&
+                      (employeeObj.dateOfBirth === null || employeeObj.dateOfBirth === undefined || employeeObj.dateOfBirth === '') ? (
+                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                    ) : (
+                      ''
+                    )}
+                  </div>
                 </div>
               </div>
+
+
             </div>
             <div className="row">
               <div className="col-12 col-md-6 mb-2">
@@ -864,7 +857,35 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
             <div className="row">
 
 
-
+              <div className="col-12 col-md-6 mb-2">
+                <div>
+                  <label htmlFor="vehicleNumber" className="form-label">
+                    Address
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <textarea
+                    className="form-control"
+                    placeholder="Enter Address"
+                    maxLength={250}
+                    value={employeeObj.address}
+                    onChange={(e) => {
+                      setErrorMessage(false);
+                      let InputValue = e.target.value;
+                      // Updated regex to allow common special characters for addresses
+                      const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
+                      setEmployeeObj((prev) => ({
+                        ...prev,
+                        address: updatedValue
+                      }));
+                    }}
+                  />
+                  {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
 
 
               <div className="col-12 col-md-6 mb-2">
