@@ -1,5 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Select from 'react-select';
+import { Fade } from "react-bootstrap"; // optional fade animation
+
 import dayjs from 'dayjs';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
@@ -166,6 +168,13 @@ const Default = () => {
     setToDate(null);
   };
 
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in animation when mounted
+    setTimeout(() => setShow(true), 100);
+  }, []);
+
   const DashboardCountData = async (startDate, endDate, i) => {
     setDashboardCount([]);
     if (startDate !== undefined && endDate !== undefined) {
@@ -274,8 +283,35 @@ const Default = () => {
           )}
         </div>
       </Grid>
+
       <Grid item xs={12}>
-        <h5 className='mb-2'>Company 1  Data</h5>
+        <div className="text-center mt-4">
+          <Fade in={show}>
+            <h6
+              className="fw-bold text-uppercase  "
+              style={{
+                fontSize: "1.8rem",
+                letterSpacing: "1.5px",
+                color: "#0d6efd",
+                textShadow: "0 0 8px rgba(13, 110, 253, 0.3)",
+                display: "inline-block",
+                position: "relative",
+                transition: "transform 0.3s ease, text-shadow 0.3s ease",
+                cursor: "default",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "scale(1.05)";
+                e.target.style.textShadow = "0 0 12px rgba(13, 110, 253, 0.6)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "scale(1)";
+                e.target.style.textShadow = "0 0 8px rgba(13, 110, 253, 0.3)";
+              }}
+            >
+              🏢 Company 1
+            </h6>
+          </Fade>
+        </div>
         <Grid container spacing={gridSpacing}>
           <Grid style={{ cursor: 'pointer' }} item lg={3} sm={6} xs={12}>
             <div >
@@ -328,178 +364,10 @@ const Default = () => {
 
 
 
-          {/* <Grid style={{ cursor: 'pointer' }} item lg={3} sm={6} xs={12}>
-            <ReportCard
-              primary={dashboardCount?.purchaseOrder}
-              secondary="Purchase Order"
-              color={theme.palette.primary.dark}
-              footerData="1k Purchase Order"
-              iconPrimary={ThumbUpAltTwoTone}
-              iconFooter={TrendingUpIcon}
-            />
-          </Grid> */}
+
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          {/* <Grid item lg={8} xs={12}>
-            <Grid container spacing={gridSpacing}>
-              <Grid item xs={12} sm={6}>
-                <Grid container spacing={gridSpacing}>
-                  <Grid item xs={12}>
-                    <SalesLineCard
-                      chartData={SalesLineCardData}
-                      title="Sales Per Day"
-                      percentage="3%"
-                      icon={<TrendingDownIcon />}
-                      footerData={[
-                        {
-                          value: '$4230',
-                          label: 'Total Revenue'
-                        },
-                        {
-                          value: '321',
-                          label: 'Today Sales'
-                        }
-                      ]}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sx={{ display: { md: 'block', sm: 'none' } }}>
-                    <Card>
-                      <CardContent sx={{ p: '0 !important' }}>
-                        <Grid container alignItems="center" spacing={0}>
-                          <FlatCardBlock>
-                            <Grid container alignItems="center" spacing={1}>
-                              <Grid item>
-                                <Typography variant="subtitle2" align="left">
-                                  REALTY
-                                </Typography>
-                              </Grid>
-                              <Grid item sm zeroMinWidth>
-                                <Typography variant="h5" sx={{ color: theme.palette.error.main }} align="right">
-                                  -0.99
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                          </FlatCardBlock>
-                          <FlatCardBlock>
-                            <Grid container alignItems="center" spacing={1}>
-                              <Grid item>
-                                <Typography variant="subtitle2" align="left">
-                                  INFRA
-                                </Typography>
-                              </Grid>
-                              <Grid item sm zeroMinWidth>
-                                <Typography variant="h5" sx={{ color: theme.palette.success.main }} align="right">
-                                  -7.66
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                          </FlatCardBlock>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <RevenuChartCard chartData={RevenuChartCardData} />
-              </Grid>
-            </Grid>
-          </Grid> */}
-          {/* <Grid item lg={4} xs={12}>
-            <Card>
-              <CardHeader
-                title={
-                  <Typography component="div" className="card-header">
-                    Traffic Sources
-                  </Typography>
-                }
-              />
-              <Divider />
-              <CardContent>
-                <Grid container spacing={gridSpacing}>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Direct</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          80%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="direct" value={80} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Social</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          50%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Social" value={50} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Referral</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          20%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Referral" value={20} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Bounce</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          60%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Bounce" value={60} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Internet</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          40%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Internet" value={40} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid> */}
-        </Grid>
-      </Grid>
+
     </Grid>
   );
 };
