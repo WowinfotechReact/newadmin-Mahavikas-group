@@ -6,7 +6,6 @@ import NoResultFoundModel from 'component/NoResultFoundModal';
 import PaginationComponent from 'component/Pagination';
 import { Tooltip } from '@mui/material';
 import ProductAddUpdateModal from './ProductAddUpdateModal';
-import ModelList from 'views/Model/ModelList';
 import { GetProductList, ChangeProductStatus } from 'services/Product/ProductApi';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router';

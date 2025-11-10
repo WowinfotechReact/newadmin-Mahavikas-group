@@ -10,33 +10,13 @@ import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import PersonIcon from '@mui/icons-material/Person';
 
-import LocationCityIcon from '@mui/icons-material/LocationCity';
-//project import
-import SalesLineCard from 'views/Dashboard/card/SalesLineCard';
-import SalesLineCardData from 'views/Dashboard/card/sale-chart-1';
-import RevenuChartCard from 'views/Dashboard/card/RevenuChartCard';
-import RevenuChartCardData from 'views/Dashboard/card/revenu-chart';
-import ReportCard from './ReportCard';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-
-import { gridSpacing } from 'config.js';
-
-import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 
 import 'react-calendar/dist/Calendar.css';
 // import 'react-date-picker/dist/DatePicker.css';
 import DatePicker from 'react-date-picker';
 
-import { CalenderFilter } from 'Middleware/Utils';
-import { CalenderFilterEnum } from 'Middleware/Enum';
 import { ConfigContext } from 'context/ConfigContext';
 import { useNavigate } from 'react-router';
-import BatteryChargingFullTwoToneIcon from '@mui/icons-material/BatteryChargingFullTwoTone';
-import PowerTwoToneIcon from '@mui/icons-material/PowerTwoTone';
-import BuildCircleTwoToneIcon from '@mui/icons-material/BuildCircleTwoTone';
-import SupportAgentTwoToneIcon from '@mui/icons-material/SupportAgentTwoTone';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { GetAdminDashboardCount } from '../../../services/dashboard/DashboardApi';
 
 import { FaUsers, FaProjectDiagram, FaUniversity, FaUserTie, FaDownload, FaCalendarAlt, FaSearch } from 'react-icons/fa';

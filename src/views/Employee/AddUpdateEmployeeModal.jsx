@@ -16,7 +16,7 @@ import { GetVehicleTypeLookupList } from 'services/Master Crud/MasterVehicleType
 import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
-import AddUpdateCustomerModal from 'views/Customer/AddUpdateCustomerModal';
+// import AddUpdateCustomerModal from 'views/Customer/AddUpdateCustomerModal';
 import { GetBloodGroupLookupList } from 'services/Master Crud/BloodGroupApi';
 import { AddUpdateEmployee, GetEmployeeModel } from 'services/Employee Staff/EmployeeApi';
 import { GetDesignationLookupList, GetEmployeeTypeLookupList } from 'services/Employee/EmployeeApi';
@@ -960,12 +960,6 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
           modelAction={modelAction}
         />
       )}
-      <AddUpdateCustomerModal
-        modelRequestData={modelRequestData}
-        onHide={() => setShowCustomerModal(false)}
-        setIsAddUpdateActionDone={setIsAddUpdateActionDone}
-        show={showCustomerModal}
-      />
     </>
   );
 };
