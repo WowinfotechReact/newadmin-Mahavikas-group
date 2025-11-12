@@ -17,35 +17,31 @@ import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 // import AddUpdateCustomerModal from 'views/Customer/AddUpdateCustomerModal';
-import { GetBloodGroupLookupList } from 'services/Master Crud/BloodGroupApi';
-import { AddUpdateEmployee, GetEmployeeModel } from 'services/Employee Staff/EmployeeApi';
-import { GetDesignationLookupList, GetEmployeeTypeLookupList } from 'services/Employee/EmployeeApi';
-import { GetRoleTypeLookupList } from 'services/Master Crud/MasterRoleTypeApi';
+import { GetEmployeeModel } from 'services/Employee Staff/EmployeeApi';
+import { AddUpdateAdminUser, GetAdminUserModel, GetCompanyLookupList, GetRoleLookupList } from 'services/Company/CompanyApi';
 
 const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData, }) => {
   const [customerOption, setCustomerOption] = useState([]);
-  const [roleTypes, setRoleTypes] = useState([]);
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
-  const [bloodTypeOption, setBloodTypeOption] = useState([]);
 
   const { user, setLoader, companyID } = useContext(ConfigContext);
   const [modelAction, setModelAction] = useState('');
   const [error, setErrors] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
-  const [vehicleTypeOption, setVehicleTypeOption] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const [employeeObj, setEmployeeObj] = useState({
     password: null,
     lastName: null,
+    roleKeyID: null,
     firstName: null,
     designationID: null,
+    companyKeyID: null,
     empCode: null,
     employeeKeyID: null,
     dateOfJoining: null,
     dateOfBirth: null,
-    mobileNumber: null,
+    mobileNo: null,
     alternativeNumber: null,
     emailID: null,
     bloodGroupID: null,
@@ -56,89 +52,40 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
     address: null
   });
 
-  // Vehicle Number Plate
-  const [vehicleNoPlateImage, setVehicleNoPlateImage] = useState(null);
-  const [vehicleNoPlateImagePreview, setVehicleNoPlateImagePreview] = useState('');
-  const [vehicleNoPlateSizeError, setVehicleNoPlateSizeError] = useState();
-
-  const [uploadVehicleNoPlateImageObj, setUploadVehicleNoPlateImageObj] = useState({
-    userId: user.userKeyID,
-    projectName: 'GPS_VELVET',
-    imageFile: employeeObj.vehicleNoPlateUrl,
-    moduleName: 'Vehicle-Crud'
-  });
-
-  // RC Book Image
-  const [rcBookImage, setRcBookImage] = useState(null);
-  const [rcBookImagePreview, setRcBookImagePreview] = useState('');
-  const [rcBookSizeError, setRcBookSizeError] = useState();
-
-  const [uploadRcBookImageObj, setUploadRcBookImageObj] = useState({
-    userId: user.userKeyID,
-    projectName: 'GPS_VELVET',
-    imageFile: employeeObj.rcBookUrl,
-    moduleName: 'Vehicle-Crud'
-  });
 
   const [selectedRole, setSelectedRole] = useState(null);
   const [designationOption, setDesignationOption] = useState([]);
+  const [companyOption, setCompanyOption] = useState([]);
+  const [roleOption, setRoleOption] = useState([]);
   const [employeeTypeOption, setEmployeeTypeOption] = useState([]);
 
-  // Vehicle Front View Image
-  const [vehicleFrontViewImage, setVehicleFrontViewImage] = useState(null);
-  const [vehicleFrontViewImagePreview, setVehicleFrontViewImagePreview] = useState('');
-  const [vehicleFrontSizeError, setVehicleFrontSizeError] = useState();
 
-  const [uploadVehicleFrontViewImageObj, setUploadVehicleFrontViewImageObj] = useState({
-    userId: user.userKeyID,
-    projectName: 'GPS_VELVET',
-    imageFile: employeeObj.vehicleFrontViewUrl,
-    moduleName: 'Vehicle-Crud'
-  });
 
-  // Vehicle Back View Image
-  const [vehicleBackViewImage, setVehicleBackViewImage] = useState(null);
-  const [vehicleBackViewImagePreview, setVehicleBackViewImagePreview] = useState('');
-  const [vehicleBackSizeError, setVehicleBackSizeError] = useState();
 
-  const [uploadVehicleBackViewImageObj, setUploadVehicleBackViewImageObj] = useState({
-    userId: user.userKeyID,
-    projectName: 'GPS_VELVET',
-    imageFile: employeeObj.vehicleBackViewUrl,
-    moduleName: 'Vehicle-Crud'
-  });
-
-  useEffect(() => {
-    GetBloodGroupLookupListData();
-    GetDesignationLookupListData();
-    GetEmployeeTypeLookupListData();
-  }, []);
 
   useEffect(() => {
     if (modelRequestData?.Action === 'Update') {
-      if (modelRequestData?.employeeKeyID !== null) {
-        GetEmployeeModelData(modelRequestData?.employeeKeyID);
+      if (modelRequestData?.userKeyIDForUpdate !== null) {
+        GetAdminUserModelData(modelRequestData?.userKeyIDForUpdate);
       }
     }
   }, [modelRequestData?.Action]);
+
+
   useEffect(() => {
-    GetCustomerLookupListData();
-  }, [modelRequestData]);
+    GetCompanyLookupListData();
+  }, [show]);
 
-  // useEffect(() => {
-  //   GetVehicleTypeLookupListData();
-  // }, [modelRequestData?.Action]);
-
-  const GetDesignationLookupListData = async () => {
+  const GetCompanyLookupListData = async () => {
     try {
-      const response = await GetDesignationLookupList();
+      const response = await GetCompanyLookupList();
       if (response?.data?.statusCode === 200) {
         const designationList = response?.data?.responseData?.data || [];
-        const formattedDesignationList = designationList.map((designation) => ({
-          value: designation.designationID,
-          label: designation.designationName
+        const formattedDesignationList = designationList.map((comp) => ({
+          value: comp.companyKeyID,
+          label: comp.companyName
         }));
-        setDesignationOption(formattedDesignationList);
+        setCompanyOption(formattedDesignationList);
       } else {
         console.error('Failed to fetch designation list:', response?.data?.statusMessage || 'Unknown error');
       }
@@ -147,65 +94,55 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
     }
   };
 
-  const GetEmployeeTypeLookupListData = async () => {
+  useEffect(() => {
+    GetRoleLookupListData()
+  }, [])
+  const GetRoleLookupListData = async () => {
     try {
-      const response = await GetEmployeeTypeLookupList();
+      const response = await GetRoleLookupList();
       if (response?.data?.statusCode === 200) {
-        const employeeTypeList = response?.data?.responseData?.data || [];
-        const formattedEmployeeTypeList = employeeTypeList.map((type) => ({
-          value: type.employeeTypeID,
-          label: type.employeeTypeName
+        const designationList = response?.data?.responseData?.data || [];
+        const formattedDesignationList = designationList.map((comp) => ({
+          value: comp.roleKeyID,
+          label: comp.roleName
         }));
-        setEmployeeTypeOption(formattedEmployeeTypeList);
+        setRoleOption(formattedDesignationList);
       } else {
-        console.error('Failed to fetch employee type list:', response?.data?.statusMessage || 'Unknown error');
+        console.error('Failed to fetch designation list:', response?.data?.statusMessage || 'Unknown error');
       }
     } catch (error) {
-      console.error('Error fetching employee type list:', error);
+      console.error('Error fetching designation list:', error);
     }
   };
 
 
 
-  const GetEmployeeModelData = async (id) => {
-    // debugger
+
+
+
+  const GetAdminUserModelData = async (id) => {
+
     if (id === undefined) {
       return;
     }
 
     try {
-      const data = await GetEmployeeModel(id);
+      const data = await GetAdminUserModel(id);
       if (data?.data?.statusCode === 200) {
         setLoader(false);
         const ModelData = data.data.responseData.data; // Assuming data is an array
         console.log(ModelData.dateOfBirth, 'dsadsadasdas');
         setEmployeeObj({
           ...employeeObj,
-          aadhaarNumber: ModelData.aadhaarNumber,
-          userKeyID: ModelData?.userKeyID,
-          password: ModelData.password,
-          lastName: ModelData.lastName,
+          userKeyIDForUpdate: modelRequestData.userKeyIDForUpdate,
           firstName: ModelData.firstName,
-          designationID: ModelData.designationID,
-          empCode: ModelData.empCode,
-          employeeKeyID: ModelData.employeeKeyID,
-          dateOfJoining: dayjs(ModelData.dateOfJoining, "DD-MM-YYYY").isValid()
-            ? dayjs(ModelData.dateOfJoining, "DD-MM-YYYY").format("YYYY-MM-DD")
-            : '',
-          dateOfBirth: dayjs(ModelData.dateOfBirth, "DD-MM-YYYY").isValid()
-            ? dayjs(ModelData.dateOfBirth, "DD-MM-YYYY").format("YYYY-MM-DD")
-            : '',
-          mobileNumber: ModelData.mobileNumber,
-          alternativeNumber: ModelData.alternativeNumber,
+          lastName: ModelData.lastName,
+          roleKeyID: ModelData.roleKeyID,
+          companyKeyID: ModelData.companyKeyID,
           emailID: ModelData.emailID,
-          bloodGroupID: ModelData.bloodGroupID,
-          panNumber: ModelData.panNumber,
-          employeeTypeID: ModelData.employeeTypeID,
+          mobileNo: ModelData.mobileNo,
           password: ModelData.password,
           address: ModelData.address,
-          roleTypeID: ModelData.roleTypeID,
-
-          employeeTypeID: ModelData.employeeTypeID
         });
         // rc book
       } else {
@@ -216,12 +153,12 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       console.error('Error in GetVehicleTypeModalData: ', error);
     }
   };
-  const [selectedDesignation, setSelectedDesignation] = useState(null);
-  const [selectedEmployeeType, setSelectedEmployeeType] = useState(null);
+
 
   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
   const Submit = async () => {
+    debugger
     let isValid = false;
 
     if (
@@ -231,41 +168,18 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       employeeObj.lastName === null ||
       employeeObj.lastName === undefined ||
       employeeObj.lastName === '' ||
-      employeeObj.designationID === null ||
-      employeeObj.designationID === undefined ||
-      employeeObj.designationID === '' ||
-      // employeeObj.empCode === null ||
-      // employeeObj.empCode === undefined ||
-      // employeeObj.empCode === '' ||
-      employeeObj.dateOfJoining === null ||
-      employeeObj.dateOfJoining === undefined ||
-      employeeObj.dateOfJoining === '' ||
-      employeeObj.dateOfBirth === null ||
-      employeeObj.dateOfBirth === undefined ||
-      employeeObj.dateOfBirth === '' ||
-      employeeObj.mobileNumber === null ||
-      employeeObj.mobileNumber === undefined ||
-      employeeObj.mobileNumber === '' ||
-      employeeObj.mobileNumber?.length < 10 ||
+      employeeObj.roleKeyID === null ||
+      employeeObj.roleKeyID === undefined ||
+      employeeObj.roleKeyID === '' ||
+
+      employeeObj.mobileNo === null ||
+      employeeObj.mobileNo === undefined ||
+      employeeObj.mobileNo === '' ||
+      employeeObj.mobileNo?.length < 10 ||
       employeeObj.emailID === undefined ||
       employeeObj.emailID === '' ||
       employeeObj.emailID === null ||
-      employeeObj.bloodGroupID === null ||
-      employeeObj.bloodGroupID === undefined ||
-      employeeObj.bloodGroupID === '' ||
-      employeeObj.aadhaarNumber === null ||
-      employeeObj.aadhaarNumber === undefined ||
-      employeeObj.aadhaarNumber === '' ||
-      employeeObj.aadhaarNumber?.length < 12 ||
-      employeeObj.panNumber === null ||
-      employeeObj.panNumber === undefined ||
-      employeeObj.panNumber === '' ||
-      employeeObj.employeeTypeID === null ||
-      employeeObj.employeeTypeID === undefined ||
-      employeeObj.employeeTypeID === '' ||
-      employeeObj.roleTypeID === null ||
-      employeeObj.roleTypeID === undefined ||
-      employeeObj.roleTypeID === '' ||
+
       employeeObj.password === null ||
       employeeObj.password === undefined ||
       employeeObj.password === '' ||
@@ -283,24 +197,15 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
 
     const apiParam = {
       userKeyID: user.userKeyID,
-      aadhaarNumber: employeeObj.aadhaarNumber,
-      employeeKeyID: modelRequestData?.employeeKeyID,
+      userKeyIDForUpdate: modelRequestData?.userKeyIDForUpdate,
       firstName: employeeObj.firstName,
       lastName: employeeObj.lastName,
-      designationID: employeeObj.designationID,
-      empCode: employeeObj.empCode,
-      dateOfJoining: employeeObj.dateOfJoining,
-      dateOfBirth: employeeObj.dateOfBirth,
-      mobileNumber: employeeObj.mobileNumber,
-      alternativeNumber: employeeObj.alternativeNumber,
+      mobileNo: employeeObj.mobileNo,
       emailID: employeeObj.emailID,
-      bloodGroupID: employeeObj.bloodGroupID,
-      panNumber: employeeObj.panNumber,
-      employeeTypeID: employeeObj.employeeTypeID,
       password: employeeObj.password,
       address: employeeObj.address,
-      roleTypeID: employeeObj.roleTypeID,
-      designationID: employeeObj.designationID,
+      roleKeyID: employeeObj.roleKeyID,
+      companyKeyID: employeeObj.companyKeyID,
     };
     if (!isValid) {
       AddUpdateEmployeeData(apiParam);
@@ -309,9 +214,9 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
 
   const AddUpdateEmployeeData = async (apiParam) => {
     try {
-      let url = '/AddUpdateEmployee'; // Default URL for Adding Data
+      let url = '/AddUpdateAdminUser'; // Default URL for Adding Data
 
-      const response = await AddUpdateEmployee(url, apiParam);
+      const response = await AddUpdateAdminUser(url, apiParam);
       if (response) {
         if (response?.data?.statusCode === 200) {
 
@@ -338,51 +243,10 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
   };
 
 
-  const GetCustomerLookupListData = async () => {
-    try {
-      const response = await GetCustomerLookupList(companyID); // Ensure this function is imported correctly
 
-      if (response?.data?.statusCode === 200) {
-        const customerLookupList = response?.data?.responseData?.data;
 
-        const formattedCustomerList = customerLookupList.map((customerItem) => ({
-          value: customerItem.customerID,
-          label: customerItem.name,
-          customerKeyID: customerItem.customerKeyID
-        }));
 
-        setCustomerOption(formattedCustomerList); // Make sure you have a state setter function for IVR list
-      } else {
-        console.error('Failed to fetch Customer lookup list:', response?.data?.statusMessage || 'Unknown error');
-      }
-    } catch (error) {
-      console.error('Error fetching Customer lookup list:', error);
-    }
-  };
 
-  const handleDateChange = (date) => {
-    setEmployeeObj((prevState) => ({
-      ...prevState,
-      dateOfBirth: dayjs(date).format('YYYY-MM-DD')  // Store as string
-    }));
-  };
-  const handleDateOfJoiningChange = (date) => {
-    setEmployeeObj((prevState) => ({
-      ...prevState,
-      dateOfJoining: dayjs(date).format('YYYY-MM-DD') // Store as string
-    }));
-  };
-
-  const handleBloodTypeChange = (selectedOption) => {
-    setEmployeeObj((prev) => ({
-      ...prev,
-      bloodGroupID: selectedOption ? selectedOption.value : ''
-    }));
-  };
-
-  useEffect(() => {
-    GetBloodGroupLookupListData();
-  }, []);
 
   function convertDateStringToDate(date) {
     if (typeof date !== 'string' || !date.includes('/')) {
@@ -393,56 +257,10 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
     return new Date(Number(year), Number(month) - 1, Number(day));
   }
 
-  const GetBloodGroupLookupListData = async () => {
-    try {
-      const response = await GetBloodGroupLookupList(); // Ensure this function is imported correctly
 
-      if (response?.data?.statusCode === 200) {
-        const bloodGrpLookupList = response?.data?.responseData?.data || [];
 
-        const formattedBloodGrpList = bloodGrpLookupList.map((bloodType) => ({
-          value: bloodType.bloodGroupID,
-          label: bloodType.bloodGroupName
-        }));
 
-        setBloodTypeOption(formattedBloodGrpList); // Make sure you have a state setter function for IVR list
-      } else {
-        console.error('Failed to fetch role Type lookup list:', response?.data?.statusMessage || 'Unknown error');
-      }
-    } catch (error) {
-      console.error('Error fetching role Type lookup list:', error);
-    }
-  };
 
-  useEffect(() => {
-    GetRoleTypeLookupListData()
-  }, [])
-  const GetRoleTypeLookupListData = async () => {
-    setLoader(true);
-    try {
-      const response = await GetRoleTypeLookupList(); // Ensure this function is imported correctly
-      if (response?.data?.statusCode === 200) {
-        setLoader(false);
-        const roleTypeLookupList = response?.data?.responseData?.data;
-        const formattedRoles = roleTypeLookupList.map((roleType) => ({
-          value: roleType.roleTypeID,
-          label: roleType.roleTypeName
-        }));
-        setRoleTypes(formattedRoles);
-      } else {
-        setLoader(false);
-        console.error('Failed to fetch role type lookup list:', response?.data?.statusMessage || 'Unknown error');
-      }
-    } catch (error) {
-      setLoader(false);
-      console.error('Error fetching role type lookup list:', error);
-    }
-  };
-  const companyOption = [
-    { value: 'Company 1', label: 'Company 1' },
-    { value: 'Company 2', label: 'Company 2' },
-    { value: 'Company 3', label: 'Both' },
-  ]
 
   return (
     <>
@@ -547,79 +365,28 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
               <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label htmlFor="vehicleNumber" className="form-label">
-                    Select Designation Type
+                    Select Role
                     <span style={{ color: 'red' }}>*</span>
                   </label>
                   <Select
-                    placeholder="Select Designation"
-                    options={designationOption}
-                    value={designationOption.find((option) => option.value === employeeObj.designationID) || null}
-                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, designationID: option ? option.value : '' }))}
+                    placeholder="Select Role"
+                    options={roleOption}
+                    value={roleOption.find((option) => option.value === employeeObj.roleKeyID) || null}
+                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, roleKeyID: option ? option.value : '' }))}
                     menuPosition="fixed"
                   />
                   {error &&
-                    (employeeObj.designationID === null || employeeObj.designationID === undefined || employeeObj.designationID === '') ? (
+                    (employeeObj.roleKeyID === null || employeeObj.roleKeyID === undefined || employeeObj.roleKeyID === '') ? (
                     <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                   ) : (
                     ''
                   )}
                 </div>
               </div>
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label className="form-label">
-                    Date Of Joining
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <div>
-                    <DatePicker
 
-                      value={employeeObj?.dateOfJoining} // Use "selected" instead of "value"
-                      onChange={handleDateOfJoiningChange}
-                      label="From Date"
-                      format="dd/MM/yyyy"
-                      clearIcon={null}
-                      popperPlacement="bottom-start"
-                    />
-
-                    {error &&
-                      (employeeObj.dateOfJoining === null || employeeObj.dateOfJoining === undefined || employeeObj.dateOfJoining === '') ? (
-                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="row">
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label className="form-label">
-                    Date Of Birth
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <div>
-                    <DatePicker
-                      maxDate={dayjs().subtract(18, 'year').toDate()}
 
-                      value={employeeObj?.dateOfBirth} // Use "selected" instead of "value"
-                      onChange={handleDateChange}
-                      label="From Date"
-                      format="dd/MM/yyyy"
-                      clearIcon={null}
-                      popperPlacement="bottom-start"
-                      defaultValue={employeeObj.dateOfBirth} // Calendar opens to this
-                    />
-                    {error &&
-                      (employeeObj.dateOfBirth === null || employeeObj.dateOfBirth === undefined || employeeObj.dateOfBirth === '') ? (
-                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
               <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label className="form-label">
@@ -627,9 +394,13 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                     <span style={{ color: 'red' }}>*</span>
                   </label>
                   <div>
-                    <Select options={companyOption} placeholder='Select Company' />
+                    <Select
+                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
+                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
+
+                      options={companyOption} placeholder='Select Company' />
                     {error &&
-                      (employeeObj.dateOfBirth === null || employeeObj.dateOfBirth === undefined || employeeObj.dateOfBirth === '') ? (
+                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
                       <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                     ) : (
                       ''
@@ -714,80 +485,12 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                 </div>
               </div>
             </div>
-            <div className="row">
 
-
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label htmlFor="adharNumber" className="form-label">
-                    Aadhaar Number
-                  </label>
-                  <input
-                    maxLength={14}
-                    type="text"
-                    className="form-control"
-                    id="adharNumber"
-                    placeholder="Enter Aadhaar Card Number"
-                    value={
-                      employeeObj.aadhaarNumber
-                        ? employeeObj.aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1-") // format for display
-                        : ""
-                    }
-                    onChange={(e) => {
-                      let value = e.target.value.replace(/[^0-9]/g, ""); // Keep only digits
-
-                      // Only allow 12 digits
-                      value = value.slice(0, 12);
-
-                      setEmployeeObj((prev) => ({
-                        ...prev,
-                        aadhaarNumber: value, // plain value stored
-                      }));
-                    }}
-                  />
-
-                  <span style={{ color: 'red' }}>
-                    {error && (employeeObj.aadhaarNumber === null || employeeObj.aadhaarNumber === undefined || employeeObj.aadhaarNumber === '')
-                      ? ERROR_MESSAGES
-                      : (employeeObj.aadhaarNumber !== null || employeeObj.aadhaarNumber !== undefined) && employeeObj?.aadhaarNumber?.length < 12
-                        ? 'Invalid Aadhaar Number'
-                        : ''}
-                  </span>
-                </div>
-
-              </div>
-              <div className="col-12 col-md-6 mb-2">
-                <label htmlFor="panNumber" className="form-label">
-                  PAN Number
-                </label>
-                <input
-                  maxLength={10}
-                  type="text"
-                  className="form-control"
-                  id="panNumber"
-                  placeholder="Enter PAN Number"
-                  value={employeeObj.panNumber}
-                  onChange={(e) => {
-                    let InputValue = e.target.value;
-                    const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s]/g, '').toUpperCase();
-                    setEmployeeObj((prev) => ({
-                      ...prev,
-                      panNumber: updatedValue
-                    }));
-                  }}
-                />
-                {error && (employeeObj.panNumber === null || employeeObj.panNumber === undefined || employeeObj.panNumber === '') ? (
-                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                ) : (
-                  ''
-                )}
-              </div>
-            </div>
             <div className="row">
 
               <div className="col-12 col-md-6 mb-2">
                 <div>
-                  <label htmlFor="mobileNumber" className="form-label">
+                  <label htmlFor="mobileNo" className="form-label">
                     Mobile Number
                     <span style={{ color: 'red' }}>*</span>
                   </label>
@@ -795,9 +498,9 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                     maxLength={10}
                     type="text"
                     className="form-control"
-                    id="mobileNumber"
+                    id="mobileNo"
                     placeholder="Enter Contact Number"
-                    value={employeeObj.mobileNumber}
+                    value={employeeObj.mobileNo}
                     onChange={(e) => {
                       setErrorMessage('');
                       const value = e.target.value;
@@ -807,53 +510,23 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                       FormattedNumber = FormattedNumber.replace(/^[0-5]/, '');
                       setEmployeeObj((prev) => ({
                         ...prev,
-                        mobileNumber: FormattedNumber
+                        mobileNo: FormattedNumber
                       }));
                     }}
                   />
                   <span style={{ color: 'red' }}>
                     {error &&
-                      (employeeObj.mobileNumber === null || employeeObj.mobileNumber === undefined || employeeObj.mobileNumber === '')
+                      (employeeObj.mobileNo === null || employeeObj.mobileNo === undefined || employeeObj.mobileNo === '')
                       ? ERROR_MESSAGES
-                      : (employeeObj.mobileNumber !== null || employeeObj.mobileNumber !== undefined) &&
-                        employeeObj?.mobileNumber?.length < 10
+                      : (employeeObj.mobileNo !== null || employeeObj.mobileNo !== undefined) &&
+                        employeeObj?.mobileNo?.length < 10
                         ? 'Invalid phone Number'
                         : ''}
                   </span>
                 </div>
               </div>
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label htmlFor="alternativeNumber" className="form-label">
-                    Alternative Mobile Number
-                  </label>
-                  <input
-                    maxLength={10}
-                    type="text"
-                    className="form-control"
-                    id="alternativeNumber"
-                    placeholder="Enter Contact Number"
-                    value={employeeObj.alternativeNumber}
-                    onChange={(e) => {
-                      setErrorMessage('');
-                      const value = e.target.value;
-                      let FormattedNumber = value.replace(/[^0-9]/g, ''); // Allows only numbers
-
-                      // Apply regex to ensure the first digit is between 6 and 9
-                      FormattedNumber = FormattedNumber.replace(/^[0-5]/, '');
-                      setEmployeeObj((prev) => ({
-                        ...prev,
-                        alternativeNumber: FormattedNumber
-                      }));
-                    }}
-                  />
-                </div>
-              </div>
             </div>
-            <div className="row">
 
-
-            </div>
             <div className="row">
 
 

@@ -1,23 +1,16 @@
 import { Base_Url } from 'component/Base-Url/BaseUrl';
 import { postApiWithAuthenticated, getListWithAuthenticated } from 'services/ApiMethod/ApiMethod';
 
-const EmployeeBaseUrl = `${Base_Url}/Employee`;
+const EmployeeBaseUrl = `${Base_Url}/AppUser`;
 
-export const GetEmployeeList = async (params) => {
-  let url = `${EmployeeBaseUrl}/GetEmployeeList`;
+export const GetAppUserList = async (params) => {
+  let url = `${EmployeeBaseUrl}/GetAppUserList`;
 
   const res = await postApiWithAuthenticated(url, params);
   return res;
 };
 
-export const AddUpdateEmployee = async (url = '', params) => {
-  if (params.employeeKeyID === null || params.employeeKeyID === undefined) {
-    delete params.employeeKeyID;
-  }
 
-  const res = await postApiWithAuthenticated(`${EmployeeBaseUrl}${url}`, params);
-  return res;
-};
 export const ResetEmployeeMACAddress = async (url = '', params) => {
   
 

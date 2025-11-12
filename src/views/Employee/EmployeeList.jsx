@@ -2,12 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router';
+import { BsPerson, BsEnvelope, BsTelephone } from "react-icons/bs";
+
 import PaginationComponent from 'component/Pagination';
 import { ConfigContext } from 'context/ConfigContext';
-import { FaEye, FaEyeSlash, FaCopy } from 'react-icons/fa'; // Icons for eye and eye-slash
 import * as XLSX from 'xlsx';
 import { toast } from 'react-toastify';
-import { ChangeVehicleStatus, GetVehicleList } from 'services/Vehicle/VehicleApi';
 import NoResultFoundModel from 'component/NoResultFoundModal';
 import ImageModal from 'component/ImageModal';
 import Android12Switch from 'component/Android12Switch';
@@ -16,14 +16,14 @@ import SuccessPopupModal from 'component/SuccessPopupModal';
 import { Tooltip } from '@mui/material';
 // import VehicleTableViewModal from './VehicleTableViewModal';
 import AddUpdateEmployeeModal from './AddUpdateEmployeeModal';
-import { ChangeEmployeeStatus, GetEmployeeList, ResetEmployeeMACAddress } from 'services/Employee Staff/EmployeeApi';
+import { ChangeEmployeeStatus, ResetEmployeeMACAddress } from 'services/Employee Staff/EmployeeApi';
 import ResetIMEIModal from 'component/Staff/ResetIMEIModal';
 import { Link } from 'react-router-dom';
 import { hasPermission } from 'Middleware/permissionUtils';
 import { FaUserShield, FaUsersCog, FaStore, FaCalculator, FaTools, FaUserTie } from "react-icons/fa";
-import { MdAdminPanelSettings } from "react-icons/md";
 import EmployeeInstituteModal from './EmployeeInstituteModal';
 import ViewEmployeeModal from './ViewEmployeeModal';
+import { GetAdminUserList } from 'services/Company/CompanyApi';
 
 
 
@@ -73,38 +73,29 @@ const EmployeeList = () => {
   useEffect(() => {
     // debugger
     if (isAddUpdateActionDone) {
-      GetEmployeeListData(1, null, toDate, fromDate);
+      GetAdminUserListData(1, null, toDate, fromDate);
       setSearchKeyword('');
     }
     setIsAddUpdateActionDone(false);
   }, [isAddUpdateActionDone]);
 
   useEffect(() => {
-    GetEmployeeListData(1, null, toDate, fromDate);
+    GetAdminUserListData(1, null, toDate, fromDate);
   }, [setIsAddUpdateActionDone]);
 
 
-  const roleIcons = {
-    "CRM": <FaUsersCog className="text-primary role-icon bounce" />,
-    "Admin": <MdAdminPanelSettings className="text-danger role-icon pulse" />,
-    "Super Admin": <FaUserShield className="text-danger role-icon spin-slow" />,
-    "Store": <FaStore className="text-success role-icon bounce" />,
-    "Accountant": <FaCalculator className="text-info role-icon pulse" />,
-    "Site Engineer": <FaTools className="text-secondary role-icon wiggle" />
-  };
 
-  const GetEmployeeListData = async (pageNumber, searchKeywordValue, toDate, fromDate) => {
-    // debugger
+  const GetAdminUserListData = async (pageNumber, searchKeywordValue, toDate, fromDate) => {
     setLoader(true);
+
     try {
-      const data = await GetEmployeeList({
+      const data = await GetAdminUserList({
         pageSize,
         userKeyID: user.userKeyID,
         pageNo: pageNumber - 1, // Page numbers are typically 0-based in API calls
         searchKeyword: searchKeywordValue === undefined ? searchKeyword : searchKeywordValue,
         toDate: toDate ? dayjs(toDate).format('YYYY-MM-DD') : null,
         fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD') : null,
-        companyKeyID: companyID
       });
 
       if (data) {
@@ -133,15 +124,16 @@ const EmployeeList = () => {
   const VehicleAddBtnClicked = () => {
     setModelRequestData({
       ...modelRequestData,
-      employeeKeyID: null,
+      userKeyIDForUpdate: null,
       Action: null
     });
     setShowEmployeeModal(true);
   };
-  const editEmp = () => {
+  const editEmp = (value) => {
+
     setModelRequestData({
       ...modelRequestData,
-      employeeKeyID: null,
+      userKeyIDForUpdate: value.userKeyIDForUpdate,
       Action: 'Update'
     });
     setShowEmployeeModal(true);
@@ -149,7 +141,7 @@ const EmployeeList = () => {
   const VehicleEditBtnClicked = (value) => {
     setModelRequestData({
       ...modelRequestData,
-      employeeKeyID: value.employeeKeyID,
+      userKeyIDForUpdate: value.userKeyIDForUpdate,
       Action: 'Update'
     });
     setShowEmployeeModal(true);
@@ -165,12 +157,12 @@ const EmployeeList = () => {
     }
     setSearchKeyword(capitalizedValue);
     setCurrentPage(1);
-    GetEmployeeListData(1, capitalizedValue, toDate, fromDate);
+    GetAdminUserListData(1, capitalizedValue, toDate, fromDate);
   };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    GetEmployeeListData(pageNumber, null, toDate, fromDate);
+    GetAdminUserListData(pageNumber, null, toDate, fromDate);
   };
 
   const closeAll = () => {
@@ -181,7 +173,7 @@ const EmployeeList = () => {
     setCurrentPage(1);
     setToDate(null);
     setFromDate(null);
-    GetEmployeeListData(1, null, null, null);
+    GetAdminUserListData(1, null, null, null);
   };
 
   const handleStatusChange = (row) => {
@@ -202,8 +194,8 @@ const EmployeeList = () => {
 
     // debugger
     try {
-      const { employeeKeyID } = row; // Destructure to access only what's needed
-      const response = await ChangeEmployeeStatus(employeeKeyID, user.userKeyID);
+      const { userKeyIDForUpdate } = row; // Destructure to access only what's needed
+      const response = await ChangeEmployeeStatus(userKeyIDForUpdate, user.userKeyID);
 
       if (response && response.data.statusCode === 200) {
         setLoader(false);
@@ -211,7 +203,7 @@ const EmployeeList = () => {
         // Successfully changed the status
         setShowStatusChangeModal(false);
         setStateChangeStatus(null);
-        GetEmployeeListData(currentPage, null, toDate, fromDate);
+        GetAdminUserListData(currentPage, null, toDate, fromDate);
         // GetMasterDistrictListData(currentPage, null, toDate, fromDate);
         setShowSuccessModal(true);
         setModelAction('Employee status changed successfully.');
@@ -251,7 +243,7 @@ const EmployeeList = () => {
   const VehicleViewBtnClicked = async (row) => {
     setModelRequestData({
       ...modelRequestData,
-      employeeKeyID: row.employeeKeyID
+      userKeyIDForUpdate: row.userKeyIDForUpdate
     });
     setShowVehicleViewModal(true);
   };
@@ -324,12 +316,12 @@ const EmployeeList = () => {
   const ResetIMEIBtnClick = (value) => {
     setModelRequestData((prev) => ({
       ...prev,
-      employeeKeyID: value.employeeKeyID,
+      userKeyIDForUpdate: value.userKeyIDForUpdate,
       resetType: 'MACAddress',
       userKeyID: user.userKeyID
     }));
     const apiParam = {
-      employeeKeyID: value.employeeKeyID,
+      userKeyIDForUpdate: value.userKeyIDForUpdate,
       resetType: 'MACAddress',
       userKeyID: user.userKeyID
     }
@@ -368,16 +360,11 @@ const EmployeeList = () => {
 
 
   const [expandedLead, setExpandedLead] = useState(null);
-  const toggleExpand = (employeeKeyID) => {
-    setExpandedLead((prev) => (prev === employeeKeyID ? null : employeeKeyID));
+  const toggleExpand = (userKeyIDForUpdate) => {
+    setExpandedLead((prev) => (prev === userKeyIDForUpdate ? null : userKeyIDForUpdate));
   };
 
-  const emdDataMap = [
-    { name: 'Sandeep Maurya', Designation: 'Sr Professor', address: 'Noida', phNo: '+91 9876543215' },
-    { name: 'Aniket', Designation: 'Jr Professor', address: 'white hill ,pune', phNo: '+91 9954353415' },
-    { name: 'Vishal W', Designation: 'Math Professor', address: 'green Valley , sector-2', phNo: '+91 75890343556' },
-    { name: 'Shubham S', Designation: 'PT Professor ', address: 'CBS', phNo: '+91 8520258963' },
-  ]
+
 
   const AssignedInstituteBtn = () => {
 
@@ -418,14 +405,13 @@ const EmployeeList = () => {
                   {" "}  <span className="d-none d-sm-inline">Export</span>
                 </button>
               </Tooltip>
-              {hasPermission(permissions, 'Employee', 'Can Insert') && (
-                <Tooltip title="Add Employee">
-                  <button onClick={() => VehicleAddBtnClicked()} style={{ background: '#ffaa33', color: 'white' }} className="btn  btn-sm d-none d-sm-inline ">
-                    <i className="fa-solid fa-plus" style={{ fontSize: '11px' }}></i>{" "}
-                    <span className="d-none d-sm-inline">Add</span>
-                  </button>
-                </Tooltip>
-              )}
+              <Tooltip title="Add Employee">
+                <button onClick={() => VehicleAddBtnClicked()} style={{ background: '#ffaa33', color: 'white' }} className="btn  btn-sm d-none d-sm-inline ">
+                  <i className="fa-solid fa-plus" style={{ fontSize: '11px' }}></i>{" "}
+                  <span className="d-none d-sm-inline">Add</span>
+                </button>
+              </Tooltip>
+
 
             </div>
           </div>
@@ -436,51 +422,63 @@ const EmployeeList = () => {
               <thead style={{ position: 'sticky', top: -1, zIndex: 1, backgroundColor: '#ff7d34', color: '#fff' }}>
                 <tr className="text-nowrap">
                   <th className="text-center">Sr.No.</th>
-                  <th className="text-center">Employee Name</th>
+                  <th className="text-center">Employee Info</th>
 
 
 
 
 
 
-                  <th className="text-center">Designation</th>
+
                   <th className="text-center">Address</th>
-                  <th className="text-center">Phone No.</th>
+                  <th className="text-center">Company Name</th>
                   <th className="text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {emdDataMap?.map((value, idx) => (
+                {vehicleListData?.map((value, idx) => (
                   <tr className="tableBodyTd text-nowrap" key={idx}>
                     <td className="text-center">{(currentPage - 1) * pageSize + idx + 1}</td>
-                    <td className="text-center" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => toggleExpand(value.employeeKeyID)}>
-                      <span >{value.name} </span>
 
+
+
+
+
+
+
+
+
+
+
+
+                    <td className="text-center">
+                      <div className="d-flex flex-column align-items-center">
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                          <BsPerson className="text-primary" />
+                          <span>{value.fullName || "N/A"}</span>
+                        </div>
+
+                        <div className="d-flex align-items-center gap-2">
+                          <BsTelephone className="text-success" />
+                          <span>{value.mobileNo || "N/A"}</span>
+                        </div>
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                          <BsEnvelope className="text-danger" />
+                          <span>{value.emailID || "N/A"}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className='text-center'>
+                      {value.address?.length > 30 ? (
+                        <Tooltip title={value.address}>{`${value.address?.substring(0, 30)}...`}</Tooltip>
+                      ) : (
+                        <>{value.address}</>
+                      )}
 
                     </td>
 
-
-
-                    {/* <td className="text-center">{value.roleTypeName}</td> */}
-
-
-
-
-
-
-
-
-
-
-
                     <td className='text-center'>
-                      {value.Designation}
-                    </td>
-                    <td className='text-center'>
-                      {value.address}
-                    </td>
-                    <td className='text-center'>
-                      {value.phNo}
+                      {value.companyName}
                     </td>
 
 
@@ -491,64 +489,62 @@ const EmployeeList = () => {
 
                       <div className="">
 
-                        {hasPermission(permissions, 'Employee', 'Can Update') && (
-                          <Tooltip title=" Assigned Institute">
-                            <button
-                              style={{
-                                padding: '4px 8px', // Adjust padding for smaller size
-                                fontSize: '12px', // Optional: smaller font size
-                                // height: '28px', // Set height
-                                // width: '28px', // Set width,
-                                background: '#ffaa33', color: 'white'
-                              }}
-                              onClick={() => AssignedInstituteBtn()}
-                              type="button"
 
-                              className="btn-sm btn me-2"
-                            >
-                              Assigned Institute
+                        <Tooltip title=" Assigned Institute">
+                          <button
+                            style={{
+                              padding: '4px 8px', // Adjust padding for smaller size
+                              fontSize: '12px', // Optional: smaller font size
+                              // height: '28px', // Set height
+                              // width: '28px', // Set width,
+                              background: '#ffaa33', color: 'white'
+                            }}
+                            onClick={() => AssignedInstituteBtn()}
+                            type="button"
 
-                            </button>
-                          </Tooltip>
-                        )}
+                            className="btn-sm btn me-2"
+                          >
+                            Assigned Institute
 
-                        {hasPermission(permissions, 'Employee', 'Can Update') && (
-                          <Tooltip title="Update Employee">
-                            <button
-                              style={{
-                                padding: '4px 8px', // Adjust padding for smaller size
-                                fontSize: '12px', // Optional: smaller font size
-                                height: '28px', // Set height
-                                width: '28px', // Set width,
-                                background: '#ffaa33', color: 'white'
-                              }}
-                              onClick={() => editEmp()}
-                              type="button"
+                          </button>
+                        </Tooltip>
 
-                              className="btn-sm btn me-2"
-                            >
-                              <i className="fa-solid fa-pen-to-square"></i>
-                            </button>
-                          </Tooltip>
-                        )}
-                        {hasPermission(permissions, 'Employee', 'Can Update') && (
-                          <Tooltip title="View Employee">
-                            <button
-                              style={{
-                                padding: '4px 8px', // Adjust padding for smaller size
-                                fontSize: '12px', // Optional: smaller font size
-                                height: '28px', // Set height
-                                width: '48px', // Set width,
-                                background: '#ffaa33', color: 'white'
-                              }}
-                              onClick={() => viewEmpDetails()}
-                              type="button"
 
-                              className="btn-sm btn me-2"
-                            >
-                              View                            </button>
-                          </Tooltip>
-                        )}
+                        <Tooltip title="Update Employee">
+                          <button
+                            style={{
+                              padding: '4px 8px', // Adjust padding for smaller size
+                              fontSize: '12px', // Optional: smaller font size
+                              height: '28px', // Set height
+                              width: '28px', // Set width,
+                              background: '#ffaa33', color: 'white'
+                            }}
+                            onClick={() => editEmp(value)}
+                            type="button"
+
+                            className="btn-sm btn me-2"
+                          >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                          </button>
+                        </Tooltip>
+
+                        <Tooltip title="View Employee">
+                          <button
+                            style={{
+                              padding: '4px 8px', // Adjust padding for smaller size
+                              fontSize: '12px', // Optional: smaller font size
+                              height: '28px', // Set height
+                              width: '48px', // Set width,
+                              background: '#ffaa33', color: 'white'
+                            }}
+                            onClick={() => viewEmpDetails()}
+                            type="button"
+
+                            className="btn-sm btn me-2"
+                          >
+                            View                            </button>
+                        </Tooltip>
+
 
                       </div>
 
@@ -578,7 +574,7 @@ const EmployeeList = () => {
         resetBtnClick={() =>
           ResetIMEI({
             userKeyID: user.userKeyID,
-            employeeKeyID: modelRequestData.employeeKeyID,
+            userKeyIDForUpdate: modelRequestData.userKeyIDForUpdate,
             resetType: 'MACAddress',
 
             // Use latest state value

@@ -277,14 +277,13 @@ const CustomerFirmList = () => {
             </div> */}
 
             <div className="d-flex align-items-center ms-2 gap-2 mt-2 mt-sm-0">
-              {hasPermission(permissions, 'Customer', 'Can Insert') && (
-                <Tooltip title="Add Customer / Firm" >
-                  <button onClick={() => CustomerAddBtnClicked()} style={{ background: '#ffaa33', color: 'white' }} className="btn  btn-sm d-none d-sm-inline">
-                    <i className="fa-solid fa-plus" style={{ fontSize: '11px' }}></i>
-                    <span className="d-none d-sm-inline">Add</span>
-                  </button>
-                </Tooltip>
-              )}
+              <Tooltip title="Add Customer / Firm" >
+                <button onClick={() => CustomerAddBtnClicked()} style={{ background: '#ffaa33', color: 'white' }} className="btn  btn-sm d-none d-sm-inline">
+                  <i className="fa-solid fa-plus" style={{ fontSize: '11px' }}></i>
+                  <span className="d-none d-sm-inline">Add</span>
+                </button>
+              </Tooltip>
+
 
               {/* <Tooltip title="Export">
                 <button className="btn btn-warning btn-sm d-none d-sm-inline" style={{ marginRight: '2px' }}>
@@ -352,40 +351,38 @@ const CustomerFirmList = () => {
                     {/* <td className="text-center">{row.createdOnDate ? dayjs(row.createdOnDate).format('DD/MM/YYYY') : '-'}</td> */}
                     <td className="text-center">
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                        {hasPermission(permissions, 'Customer', 'Can Update') && (
-                          <Tooltip title="Update Institute">
-                            <button
-                              style={{
-                                padding: '4px 8px',
-                                fontSize: '12px',
-                                height: '28px',
-                                width: '28px', background: '#ffaa33', color: 'white'
-                              }}
-                              onClick={() => EditCustomerBtnClick(row)}
-                              type="button"
-                              className="btn-sm btn "
-                            >
-                              <i className="fa-solid fa-pen-to-square"></i>
-                            </button>
-                          </Tooltip>
-                        )}
-                        {hasPermission(permissions, 'Customer', 'Can Update') && (
-                          <Tooltip title="Update Institute">
-                            <button
-                              style={{
-                                padding: '4px 8px',
-                                fontSize: '12px',
-                                height: '28px',
-                                width: '68px', background: '#ffaa33', color: 'white'
-                              }}
-                              onClick={() => instituteUserBtnClick(row)}
-                              type="button"
-                              className="btn-sm btn "
-                            >
-                              Add User
-                            </button>
-                          </Tooltip>
-                        )}
+                        <Tooltip title="Update Institute">
+                          <button
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '12px',
+                              height: '28px',
+                              width: '28px', background: '#ffaa33', color: 'white'
+                            }}
+                            onClick={() => EditCustomerBtnClick(row)}
+                            type="button"
+                            className="btn-sm btn "
+                          >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                          </button>
+                        </Tooltip>
+
+                        <Tooltip title="Update Institute">
+                          <button
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '12px',
+                              height: '28px',
+                              width: '68px', background: '#ffaa33', color: 'white'
+                            }}
+                            onClick={() => instituteUserBtnClick(row)}
+                            type="button"
+                            className="btn-sm btn "
+                          >
+                            Add User
+                          </button>
+                        </Tooltip>
+
 
 
                       </div>
