@@ -40,6 +40,7 @@ const EmployeeList = () => {
   const [totalRecords, setTotalRecords] = useState(-1);
   const { setLoader, user, companyID, permissions } = useContext(ConfigContext);
   const [modelAction, setModelAction] = useState();
+
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState();
@@ -96,6 +97,7 @@ const EmployeeList = () => {
         searchKeyword: searchKeywordValue === undefined ? searchKeyword : searchKeywordValue,
         toDate: toDate ? dayjs(toDate).format('YYYY-MM-DD') : null,
         fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD') : null,
+        companyKeyID: companyID
       });
 
       if (data) {

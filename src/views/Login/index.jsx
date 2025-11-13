@@ -1,5 +1,6 @@
 
 import { Link as RouterLink } from 'react-router-dom';
+import Select from 'react-select';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -22,6 +23,7 @@ import { VerifyLoginCredential } from 'services/LoginAuth/LoginApi';
 import { ConfigContext, useAuth } from 'context/ConfigContext';
 import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import { useNavigate } from 'react-router';
+import { GetCompanyLookupList, GetCompanyLookupListWithoutAuth } from 'services/Company/CompanyApi';
 // import Logo from '../../assets/images/velvetLogo.png'
 
 // ==============================|| LOGIN ||============================== //
@@ -35,9 +37,11 @@ const Login = () => {
   const [requireErrorMessage, setRequireErrorMessage] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState();
   const [showPassword, setShowPassword] = useState(false);
+  const [companyOption, setCompanyOption] = useState([])
   const [LoginObj, setLoginObj] = useState({
     mobileNo: null,
     password: '',
+    companyKeyID: null,
     loginFrom: null,
     macAddress: null
   });
@@ -63,6 +67,12 @@ const Login = () => {
     };
   }, []);
 
+  useEffect(() => {
+    GetCompanyLookupListData()
+  }, []);
+
+
+
   // 2] This function validate email id & password is in valid format
   const LoginBtnClicked = () => {
     setErrorMessage('');
@@ -82,7 +92,7 @@ const Login = () => {
       mobileNo: LoginObj.mobileNo,
       password: LoginObj.password,
       roleID: 1,
-      companyID: 1
+      companyKeyIDs: LoginObj.companyKeyID
 
 
       // mobileNo: "8798789798",
@@ -155,6 +165,29 @@ const Login = () => {
   //   };
   //   fetchIp();
   // }, []);
+
+
+  const GetCompanyLookupListData = async () => {
+    try {
+      const response = await GetCompanyLookupListWithoutAuth();
+
+      if (response?.data?.statusCode === 200) {
+        const list = response?.data?.responseData?.data || [];
+
+        const formattedList = list.map((comp) => ({
+          value: comp.companyKeyID,
+          label: comp.companyName
+        }));
+
+        setCompanyOption([
+          { value: "ALL", label: "All Companies" },
+          ...formattedList
+        ]);
+      }
+    } catch (error) {
+      console.error("Error fetching company list:", error);
+    }
+  };
 
   return (
     <div className="limiter">
@@ -251,21 +284,40 @@ const Login = () => {
               </span>
             </div>
             <div className="wrap-input100 validate-input" data-validate="Company selection is required">
-              <select
-                className="input100"
-                name="company"
+              <Select
+                placeholder="Select Company"
+                options={companyOption}
+                isMulti
+                value={companyOption?.filter(option =>
+                  LoginObj?.companyKeyID?.includes(option.value)
+                )}
+                onChange={(selectedOptions) => {
+                  if (!selectedOptions || selectedOptions.length === 0) {
+                    // None selected
+                    setLoginObj(prev => ({ ...prev, companyKeyID: [] }));
+                    return;
+                  }
 
-              >
-                <option value="">Select Company</option>
-                <option value="GovProject">Company 1</option>
-                <option value="PrivateLtd">Company 1</option>
-                <option value="StartupIndia">Startup India</option>
-              </select>
+                  const isAllSelected = selectedOptions.some(opt => opt.value === "ALL");
 
-              <span className="focus-input100" />
-              <span className="symbol-input100">
-                <i className="fa fa-building" aria-hidden="true" />
-              </span>
+                  if (isAllSelected) {
+                    // Select all actual company IDs
+                    const allIds = companyOption
+                      .filter(opt => opt.value !== "ALL")
+                      .map(opt => opt.value);
+
+                    setLoginObj(prev => ({ ...prev, companyKeyID: allIds }));
+                  } else {
+                    // Normal multi-select behavior
+                    const ids = selectedOptions.map(opt => opt.value);
+
+                    setLoginObj(prev => ({ ...prev, companyKeyID: ids }));
+                  }
+                }}
+              />
+
+
+
             </div>
 
             <div className="container-login100-form-btn">

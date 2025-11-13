@@ -11,16 +11,16 @@ import { GetCompanyLookupList } from 'services/Master Crud/MasterCompany';
 import ProfileSection from './ProfileSection';
 import Logo from '../../../assets/images/logo.jpeg';
 // assets
-
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { ConfigContext, useAuth } from 'context/ConfigContext';
+import { GetCompanyLookupListWithoutAuth } from 'services/Company/CompanyApi';
 
 // ==============================|| HEADER ||============================== //
 
 const Header = ({ drawerToggle, drawerWidth }) => {
   const { user } = useContext(ConfigContext);
 
-  console.log(user.roleTypeID, 'iujgd08s7agd08s7agdysa');
+  console.log(user.userKeyID, 'iujgd08s7agd08s7agdysa');
 
   const { companyID, changeCompany } = useAuth();
   const [companyOption, setCompanyOption] = useState([]);
@@ -32,18 +32,18 @@ const Header = ({ drawerToggle, drawerWidth }) => {
         sm: 600,
         md: 900,
         lg: 1200,
-        xl: 1536
-      }
-    }
+        xl: 1536,
+      },
+    },
   });
 
-  // useEffect(() => {
-  //   const initializeComponent = async () => {
-  //     await GetCompanyLookupListData();
-  //     setIsInitialized(true);
-  //   };
-  //   initializeComponent();
-  // }, []);
+  useEffect(() => {
+    const initializeComponent = async () => {
+      await GetCompanyLookupListData();
+      setIsInitialized(true);
+    };
+    initializeComponent();
+  }, []);
 
   const selectedCompany = useMemo(() => {
     if (!companyOption?.length) return null;
@@ -52,7 +52,7 @@ const Header = ({ drawerToggle, drawerWidth }) => {
 
   const GetCompanyLookupListData = async () => {
     try {
-      const response = await GetCompanyLookupList(user?.userKeyID);
+      const response = await GetCompanyLookupListWithoutAuth();
 
       if (response?.data?.statusCode === 200) {
         const companyLookupList = response?.data?.responseData?.data || [];
@@ -93,8 +93,7 @@ const Header = ({ drawerToggle, drawerWidth }) => {
 
   const renderHeaderContent = () => (
     <>
-      <Box
-        width={drawerWidth}
+      <Box width={drawerWidth}
       //  sx={{ zIndex: 1201 }}
       >
         <Grid container justifyContent="space-between" alignItems="center">
@@ -107,19 +106,17 @@ const Header = ({ drawerToggle, drawerWidth }) => {
             }}
           >
             {/* Logo image box */}
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                backgroundColor: '#f0f0f0',
-                marginRight: theme.spacing(1.5)
-              }}
-            >
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              backgroundColor: '#f0f0f0',
+              marginRight: theme.spacing(1.5) // Space between logo and text
+            }}>
               <img
                 src={Logo}
                 alt="Logo"
@@ -165,17 +162,13 @@ const Header = ({ drawerToggle, drawerWidth }) => {
             </Box>
           </Box>
 
-
           {/* Company Dropdown & Hamburger Icon */}
-          <Grid
-            item
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              flexGrow: 1,
-              justifyContent: { xs: 'space-between', md: 'flex-start' } // Adjust spacing
-            }}
-          >
+          <Grid item sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexGrow: 1,
+            justifyContent: { xs: 'space-between', md: 'flex-start' } // Adjust spacing
+          }}>
             <IconButton
               edge="start"
               sx={{ mr: theme.spacing(1.25) }}
@@ -187,55 +180,53 @@ const Header = ({ drawerToggle, drawerWidth }) => {
               <MenuTwoToneIcon sx={{ fontSize: '1.5rem' }} />
             </IconButton>
 
-            {/* <Box sx={{ 
-            width: { xs: '200px', md: '250px' }, // Responsive width
-            ml: { xs: theme.spacing(1), md: theme.spacing(2) }
-          }}>
-            <Select
-              options={companyOption}
-              value={selectedCompany}
-              onChange={handleCompanyChange}
-              menuPosition="fixed"
-              placeholder="Select a company"
-              isLoading={!isInitialized || companyOption.length === 0}
-              isClearable={false}
-              styles={{
-                container: (base) => ({
-                  ...base,
-                  width: '100%', // Use full container width
-                }),
-                control: (base) => ({
-                  ...base,
-                  width: '100%',
-                  minWidth: { xs: '190px', md: '350px' } // Responsive min-width
-                }),
-                menu: (base) => ({
-                  ...base,
-                  backgroundColor: '#808080'
-                }),
-                option: (base, { isFocused, isSelected }) => ({
-                  ...base,
-                  backgroundColor: isSelected ? '#606060' : isFocused ? '#707070' : '#808080',
-                  color: '#FFFFFF'
-                }),
-                singleValue: (base) => ({
-                  ...base,
-                  color: '#000000'
-                })
-              }}
-            />
-          </Box> */}
+            <Box sx={{
+              width: { xs: '200px', md: '250px' }, // Responsive width
+              ml: { xs: theme.spacing(1), md: theme.spacing(2) }
+            }}>
+              <Select
+                options={companyOption}
+                value={selectedCompany}
+                onChange={handleCompanyChange}
+                menuPosition="fixed"
+                placeholder="Select a company"
+                isLoading={!isInitialized || companyOption.length === 0}
+                isClearable={false}
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: '100%', // Use full container width
+                  }),
+                  control: (base) => ({
+                    ...base,
+                    width: '100%',
+                    minWidth: { xs: '190px', md: '350px' } // Responsive min-width
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    backgroundColor: '#808080'
+                  }),
+                  option: (base, { isFocused, isSelected }) => ({
+                    ...base,
+                    backgroundColor: isSelected ? '#606060' : isFocused ? '#707070' : '#808080',
+                    color: '#FFFFFF'
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: '#000000'
+                  })
+                }}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>
 
       {/* Spacer with responsive adjustment */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: { xs: 'none', md: 'block' } // Hide on mobile if needed
-        }}
-      />
+      <Box sx={{
+        flexGrow: 1,
+        display: { xs: 'none', md: 'block' } // Hide on mobile if needed
+      }} />
 
       {/* Profile Section - Moved to the end in mobile */}
       <Box sx={{ display: { xs: 'flex', md: 'block' }, ml: 'auto' }}>
