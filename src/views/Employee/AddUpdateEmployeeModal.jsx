@@ -364,6 +364,27 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
             <div className="row">
               <div className="col-12 col-md-6 mb-2">
                 <div>
+                  <label className="form-label">
+                    Select Company
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <div>
+                    <Select
+                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
+                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
+
+                      options={companyOption} placeholder='Select Company' />
+                    {error &&
+                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
+                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <div>
                   <label htmlFor="vehicleNumber" className="form-label">
                     Select Role
                     <span style={{ color: 'red' }}>*</span>
@@ -385,34 +406,9 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
               </div>
 
             </div>
+
             <div className="row">
-
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label className="form-label">
-                    Select Company
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <div>
-                    <Select
-                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
-                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
-
-                      options={companyOption} placeholder='Select Company' />
-                    {error &&
-                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
-                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
-
-
-            </div>
-            <div className="row">
-              <div className="col-12 col-md-6 mb-2">
+              {/* <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label className="form-label">
                     Employee Code
@@ -444,8 +440,44 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                     )}
                   </div>
                 </div>
-              </div>
+              </div> */}
+              <div className="col-12 col-md-6 mb-2">
+                <div>
+                  <label htmlFor="mobileNo" className="form-label">
+                    Mobile Number
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <input
+                    maxLength={10}
+                    type="text"
+                    className="form-control"
+                    id="mobileNo"
+                    placeholder="Enter Contact Number"
+                    value={employeeObj.mobileNo}
+                    onChange={(e) => {
+                      setErrorMessage('');
+                      const value = e.target.value;
+                      let FormattedNumber = value.replace(/[^0-9]/g, ''); // Allows only numbers
 
+                      // Apply regex to ensure the first digit is between 6 and 9
+                      FormattedNumber = FormattedNumber.replace(/^[0-5]/, '');
+                      setEmployeeObj((prev) => ({
+                        ...prev,
+                        mobileNo: FormattedNumber
+                      }));
+                    }}
+                  />
+                  <span style={{ color: 'red' }}>
+                    {error &&
+                      (employeeObj.mobileNo === null || employeeObj.mobileNo === undefined || employeeObj.mobileNo === '')
+                      ? ERROR_MESSAGES
+                      : (employeeObj.mobileNo !== null || employeeObj.mobileNo !== undefined) &&
+                        employeeObj?.mobileNo?.length < 10
+                        ? 'Invalid phone Number'
+                        : ''}
+                  </span>
+                </div>
+              </div>
               <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label htmlFor="vehicleNumber" className="form-label">
@@ -488,43 +520,7 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
 
             <div className="row">
 
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label htmlFor="mobileNo" className="form-label">
-                    Mobile Number
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <input
-                    maxLength={10}
-                    type="text"
-                    className="form-control"
-                    id="mobileNo"
-                    placeholder="Enter Contact Number"
-                    value={employeeObj.mobileNo}
-                    onChange={(e) => {
-                      setErrorMessage('');
-                      const value = e.target.value;
-                      let FormattedNumber = value.replace(/[^0-9]/g, ''); // Allows only numbers
 
-                      // Apply regex to ensure the first digit is between 6 and 9
-                      FormattedNumber = FormattedNumber.replace(/^[0-5]/, '');
-                      setEmployeeObj((prev) => ({
-                        ...prev,
-                        mobileNo: FormattedNumber
-                      }));
-                    }}
-                  />
-                  <span style={{ color: 'red' }}>
-                    {error &&
-                      (employeeObj.mobileNo === null || employeeObj.mobileNo === undefined || employeeObj.mobileNo === '')
-                      ? ERROR_MESSAGES
-                      : (employeeObj.mobileNo !== null || employeeObj.mobileNo !== undefined) &&
-                        employeeObj?.mobileNo?.length < 10
-                        ? 'Invalid phone Number'
-                        : ''}
-                  </span>
-                </div>
-              </div>
             </div>
 
             <div className="row">
