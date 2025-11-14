@@ -51,13 +51,7 @@ export const GetOEMModel = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${OEMInstallationBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
-  
+
 export const GetOEMLookupList = async () => {
     const url = `${OriginalEquipmentManufacturerBaseURI}/GetOEMLookupList`;
   

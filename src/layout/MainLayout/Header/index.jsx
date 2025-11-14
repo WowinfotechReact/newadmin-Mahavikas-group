@@ -52,10 +52,7 @@ const Header = ({ drawerToggle, drawerWidth }) => {
 
   const GetCompanyLookupListData = async () => {
     try {
-      // ❌ No API call needed
-      // const response = await GetCompanyLookupListWithoutAuth();
 
-      // ✅ Use ONLY selectedCompanies from user:
       const formattedCompanyList = user.selectedCompanies?.map((company) => ({
         value: company.companyKeyID,
         label: company.companyName,

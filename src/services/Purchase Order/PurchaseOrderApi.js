@@ -50,12 +50,7 @@ export const GetPOModel = async (leadKeyID, purchaseOrderKeyID = null) => {
 
 
 
-export const GetStateLookupList = async () => {
-    const url = `${PurchaseOrderBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
+
   
   export const ChangeStateStatus = async (id,UserKeyID) => {
     let url = `${PurchaseOrderBaseUrl}/ChangeStateStatus?StateID=${id}&UserKeyID=${UserKeyID}`;

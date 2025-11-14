@@ -171,9 +171,7 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                   employeeObj.lastName === null ||
                   employeeObj.lastName === undefined ||
                   employeeObj.lastName === '' ||
-                  employeeObj.roleKeyID === null ||
-                  employeeObj.roleKeyID === undefined ||
-                  employeeObj.roleKeyID === '' ||
+
 
                   employeeObj.mobileNo === null ||
                   employeeObj.mobileNo === undefined ||
@@ -366,27 +364,7 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                                           </div>
                                     </div>
                                     <div className="row">
-                                          <div className="col-12 col-md-6 mb-2">
-                                                <div>
-                                                      <label htmlFor="vehicleNumber" className="form-label">
-                                                            Select Role
-                                                            <span style={{ color: 'red' }}>*</span>
-                                                      </label>
-                                                      <Select
-                                                            placeholder="Select Role"
-                                                            options={roleOption}
-                                                            value={roleOption.find((option) => option.value === employeeObj.roleKeyID) || null}
-                                                            onChange={(option) => setEmployeeObj((prev) => ({ ...prev, roleKeyID: option ? option.value : '' }))}
-                                                            menuPosition="fixed"
-                                                      />
-                                                      {error &&
-                                                            (employeeObj.roleKeyID === null || employeeObj.roleKeyID === undefined || employeeObj.roleKeyID === '') ? (
-                                                            <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                                                      ) : (
-                                                            ''
-                                                      )}
-                                                </div>
-                                          </div>
+
 
                                           <div className="col-12 col-md-6 mb-2">
                                                 <div>
@@ -409,12 +387,41 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                                                       </div>
                                                 </div>
                                           </div>
+                                          <div className="col-12 col-md-6 mb-2">
+                                                <div>
+                                                      <label htmlFor="vehicleNumber" className="form-label">
+                                                            Address
+                                                            <span style={{ color: 'red' }}>*</span>
+                                                      </label>
+                                                      <textarea
+                                                            className="form-control"
+                                                            placeholder="Enter Address"
+                                                            maxLength={250}
+                                                            value={employeeObj.address}
+                                                            onChange={(e) => {
+                                                                  setErrorMessage(false);
+                                                                  let InputValue = e.target.value;
+                                                                  // Updated regex to allow common special characters for addresses
+                                                                  const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
+                                                                  setEmployeeObj((prev) => ({
+                                                                        ...prev,
+                                                                        address: updatedValue
+                                                                  }));
+                                                            }}
+                                                      />
+                                                      {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                                                            <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                                                      ) : (
+                                                            ''
+                                                      )}
+                                                </div>
+                                          </div>
 
 
                                     </div>
 
                                     <div className="row">
-                                          <div className="col-12 col-md-6 mb-2">
+                                          {/* <div className="col-12 col-md-6 mb-2">
                                                 <div>
                                                       <label className="form-label">
                                                             Employee Code
@@ -446,7 +453,7 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                                                             )}
                                                       </div>
                                                 </div>
-                                          </div>
+                                          </div> */}
 
                                           <div className="col-12 col-md-6 mb-2">
                                                 <div>
@@ -486,10 +493,6 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                                                       )}
                                                 </div>
                                           </div>
-                                    </div>
-
-                                    <div className="row">
-
                                           <div className="col-12 col-md-6 mb-2">
                                                 <div>
                                                       <label htmlFor="mobileNo" className="form-label">
@@ -527,36 +530,13 @@ const InstituteEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDon
                                                       </span>
                                                 </div>
                                           </div>
+                                    </div>
 
-                                          <div className="col-12 col-md-6 mb-2">
-                                                <div>
-                                                      <label htmlFor="vehicleNumber" className="form-label">
-                                                            Address
-                                                            <span style={{ color: 'red' }}>*</span>
-                                                      </label>
-                                                      <textarea
-                                                            className="form-control"
-                                                            placeholder="Enter Address"
-                                                            maxLength={250}
-                                                            value={employeeObj.address}
-                                                            onChange={(e) => {
-                                                                  setErrorMessage(false);
-                                                                  let InputValue = e.target.value;
-                                                                  // Updated regex to allow common special characters for addresses
-                                                                  const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
-                                                                  setEmployeeObj((prev) => ({
-                                                                        ...prev,
-                                                                        address: updatedValue
-                                                                  }));
-                                                            }}
-                                                      />
-                                                      {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
-                                                            <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                                                      ) : (
-                                                            ''
-                                                      )}
-                                                </div>
-                                          </div>
+                                    <div className="row">
+
+
+
+
                                     </div>
 
                                     <div className="row">

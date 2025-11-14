@@ -9,16 +9,19 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 
 import SuccessPopupModal from 'component/SuccessPopupModal';
-import { GetCustomerLookupList, } from 'services/CustomerStaff/CustomerStaffApi';
 import { ConfigContext } from 'context/ConfigContext';
-import { AddUpdateVehicleApi, GetVehicleModel } from 'services/Vehicle/VehicleApi';
-import { GetVehicleTypeLookupList } from 'services/Master Crud/MasterVehicleTypeApi';
 import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 // import AddUpdateCustomerModal from 'views/Customer/AddUpdateCustomerModal';
-import { GetEmployeeModel } from 'services/Employee Staff/EmployeeApi';
 import { AddUpdateAdminUser, GetAdminUserModel, GetCompanyLookupList, GetRoleLookupList } from 'services/Company/CompanyApi';
+import { GetInstituteLookupList } from 'services/Institute/InstituteApi';
+
+import { GetStateLookupList } from 'services/Master Crud/MasterStateApi';
+import { GetDistrictLookupList } from 'services/Master Crud/MasterDistrictApi';
+import { GetTalukaLookupList } from 'services/Master Crud/MasterTalukaApi';
+import { GetVillageLookupList } from 'services/Master Crud/MasterVillageApi';
+import { GetProjectLookupList } from 'services/Project/ProjectApi';
 
 const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData, }) => {
   const [customerOption, setCustomerOption] = useState([]);
@@ -31,31 +34,35 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
   const [showPassword, setShowPassword] = useState(false);
 
   const [employeeObj, setEmployeeObj] = useState({
-    password: null,
-    lastName: null,
-    roleKeyID: null,
+
     firstName: null,
-    designationID: null,
+    lastName: null,
     companyKeyID: null,
-    empCode: null,
-    employeeKeyID: null,
-    dateOfJoining: null,
-    dateOfBirth: null,
-    mobileNo: null,
-    alternativeNumber: null,
+    instituteKeyID: null,
     emailID: null,
-    bloodGroupID: null,
-    aadhaarNumber: null,
-    panNumber: null,
-    employeeTypeID: null,
+    mobileNo: null,
     password: null,
-    address: null
+    address: null,
+    zoneKeyList: null,
+    districtKeyList: null,
+    talukaKeyList: null,
+    projectKeyList: null,
+    userKeyID: null,
+    userKeyIDForUpdate: null,
+    userDetailsKeyID: null,
   });
 
 
   const [selectedRole, setSelectedRole] = useState(null);
+  const [stateOption, setStateOption] = useState([]);
+  const [projectOption, setProjectOption] = useState([]);
+  const [districtOption, setDistrictOption] = useState([]);
+  const [talukaOption, setTalukaOption] = useState([]);
+  const [villageOption, setVillageOption] = useState([]);
   const [designationOption, setDesignationOption] = useState([]);
   const [companyOption, setCompanyOption] = useState([]);
+  const [instituteOption, setInstituteOption] = useState([]);
+  const [zoneOption, setZoneOption] = useState([]);
   const [roleOption, setRoleOption] = useState([]);
   const [employeeTypeOption, setEmployeeTypeOption] = useState([]);
 
@@ -93,20 +100,19 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       console.error('Error fetching designation list:', error);
     }
   };
-
   useEffect(() => {
-    GetRoleLookupListData()
+    GetInstituteLookupListData()
   }, [])
-  const GetRoleLookupListData = async () => {
+  const GetInstituteLookupListData = async () => {
     try {
-      const response = await GetRoleLookupList();
+      const response = await GetInstituteLookupList();
       if (response?.data?.statusCode === 200) {
         const designationList = response?.data?.responseData?.data || [];
         const formattedDesignationList = designationList.map((comp) => ({
-          value: comp.roleKeyID,
-          label: comp.roleName
+          value: comp.instituteKeyID,
+          label: comp.instituteName
         }));
-        setRoleOption(formattedDesignationList);
+        setInstituteOption(formattedDesignationList);
       } else {
         console.error('Failed to fetch designation list:', response?.data?.statusMessage || 'Unknown error');
       }
@@ -114,6 +120,8 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       console.error('Error fetching designation list:', error);
     }
   };
+
+
 
 
 
@@ -137,7 +145,6 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
           userKeyIDForUpdate: modelRequestData.userKeyIDForUpdate,
           firstName: ModelData.firstName,
           lastName: ModelData.lastName,
-          roleKeyID: ModelData.roleKeyID,
           companyKeyID: ModelData.companyKeyID,
           emailID: ModelData.emailID,
           mobileNo: ModelData.mobileNo,
@@ -168,9 +175,7 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       employeeObj.lastName === null ||
       employeeObj.lastName === undefined ||
       employeeObj.lastName === '' ||
-      employeeObj.roleKeyID === null ||
-      employeeObj.roleKeyID === undefined ||
-      employeeObj.roleKeyID === '' ||
+
 
       employeeObj.mobileNo === null ||
       employeeObj.mobileNo === undefined ||
@@ -204,7 +209,6 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       emailID: employeeObj.emailID,
       password: employeeObj.password,
       address: employeeObj.address,
-      roleKeyID: employeeObj.roleKeyID,
       companyKeyID: employeeObj.companyKeyID,
     };
     if (!isValid) {
@@ -236,6 +240,138 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       console.error(error);
     }
   };
+  useEffect(() => {
+    GetStateLookupListData()
+  }, [])
+
+
+
+
+
+
+  useEffect(() => {
+    if (employeeObj.talukaKeyID !== null && employeeObj.talukaKeyID !== undefined) {
+      GetVillageLookupListData();
+    }
+  }, [employeeObj.talukaKeyID]);
+  useEffect(() => {
+    if (employeeObj.districtKeyID !== null && employeeObj.districtKeyID !== undefined) {
+      GetTalukaLookupListData();
+    }
+  }, [employeeObj.districtKeyID]);
+
+  useEffect(() => {
+    if (employeeObj.stateKeyID !== null && employeeObj.stateKeyID !== undefined) {
+      GetDistrictLookupListData();
+    }
+  }, [employeeObj.stateKeyID]);
+  const GetStateLookupListData = async () => {
+    try {
+      const response = await GetStateLookupList(); // Ensure this function is imported correctly
+
+      if (response?.data?.statusCode === 200) {
+        const stateLookupList = response?.data?.responseData?.data || [];
+
+        const formattedIvrList = stateLookupList.map((ivrItem) => ({
+          value: ivrItem.stateKeyID,
+          label: ivrItem.stateName
+        }));
+
+        setStateOption(formattedIvrList); // Make sure you have a state setter function for IVR list
+      } else {
+        console.error('Failed to fetch IVR lookup list:', response?.data?.statusMessage || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching IVR lookup list:', error);
+    }
+  };
+
+  useEffect(() => {
+    GetProjectLookupListData()
+  }, [])
+  const GetProjectLookupListData = async () => {
+    try {
+      const response = await GetProjectLookupList(); // Ensure this function is imported correctly
+
+      if (response?.data?.statusCode === 200) {
+        const stateLookupList = response?.data?.responseData?.data || [];
+
+        const formattedIvrList = stateLookupList.map((ivrItem) => ({
+          value: ivrItem.projectKeyID,
+          label: ivrItem.projectName
+        }));
+
+        setProjectOption(formattedIvrList); // Make sure you have a state setter function for IVR list
+      } else {
+        console.error('Failed to fetch IVR lookup list:', response?.data?.statusMessage || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching IVR lookup list:', error);
+    }
+  };
+
+  const GetDistrictLookupListData = async () => {
+    if (employeeObj.stateKeyID === null) return;
+
+    try {
+      let response = await GetDistrictLookupList(employeeObj?.stateKeyID);
+      if (response?.data?.statusCode === 200) {
+        const cityList = response?.data?.responseData?.data || [];
+        const formattedCityList = cityList.map((city) => ({
+          value: city.districtKeyID,
+          label: city.districtName
+        }));
+
+        setDistrictOption(formattedCityList); // Ensure this is called with correct data
+      } else {
+        console.error('Bad request');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const GetTalukaLookupListData = async () => {
+    if (employeeObj.districtKeyID === null) return;
+
+    try {
+      let response = await GetTalukaLookupList(employeeObj?.districtKeyID);
+      if (response?.data?.statusCode === 200) {
+        const talukaList = response?.data?.responseData?.data || [];
+        const formattedCityList = talukaList.map((taluka) => ({
+          value: taluka.talukaKeyID,
+          label: taluka.talukaName
+        }));
+
+        setTalukaOption(formattedCityList); // Ensure this is called with correct data
+      } else {
+        console.error('Bad request');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const GetVillageLookupListData = async () => {
+    if (employeeObj.talukaKeyID === null) return;
+
+    try {
+      let response = await GetVillageLookupList(employeeObj?.talukaKeyID);
+      if (response?.data?.statusCode === 200) {
+        const villageList = response?.data?.responseData?.data || [];
+        const formattedCityList = villageList.map((taluka) => ({
+          value: taluka.villageKeyID,
+          label: taluka.villageName
+        }));
+
+        setVillageOption(formattedCityList); // Ensure this is called with correct data
+      } else {
+        console.error('Bad request');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const closeAllModal = () => {
     onHide();
@@ -259,7 +395,45 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
 
 
 
+  const handleStateChange = (selectedOption) => {
+    setEmployeeObj((prev) => ({
+      ...prev,
+      stateKeyID: selectedOption ? selectedOption.value : null,
+      districtKeyID: '',
+      talukaKeyID: '',
+      // villageName:''
+    }));
+  };
+  const handleDistrictChange = (selectedOption) => {
+    setEmployeeObj((prev) => ({
+      ...prev,
+      districtKeyID: selectedOption ? selectedOption.value : null,
+      talukaKeyID: '',
+      // villageName:''
+    }));
+  };
 
+  const handleTalukaChange = (selectedOption) => {
+    setEmployeeObj((prev) => ({
+      ...prev,
+      talukaKeyID: selectedOption ? selectedOption.value : null,
+      // villageName:''
+    }));
+  };
+  const handleVillageChange = (selectedOption) => {
+    setEmployeeObj((prev) => ({
+      ...prev,
+      villageKeyID: selectedOption ? selectedOption.value : null,
+      // villageName:''
+    }));
+  };
+  const handleProjectChange = (selectedOption) => {
+    setEmployeeObj((prev) => ({
+      ...prev,
+      projectKeyList: selectedOption ? selectedOption.value : null,
+
+    }));
+  };
 
 
   return (
@@ -361,52 +535,6 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                 </div>
               </div>
             </div>
-            <div className="row">
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label className="form-label">
-                    Select Company
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <div>
-                    <Select
-                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
-                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
-
-                      options={companyOption} placeholder='Select Company' />
-                    {error &&
-                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
-                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label htmlFor="vehicleNumber" className="form-label">
-                    Select Role
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <Select
-                    placeholder="Select Role"
-                    options={roleOption}
-                    value={roleOption.find((option) => option.value === employeeObj.roleKeyID) || null}
-                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, roleKeyID: option ? option.value : '' }))}
-                    menuPosition="fixed"
-                  />
-                  {error &&
-                    (employeeObj.roleKeyID === null || employeeObj.roleKeyID === undefined || employeeObj.roleKeyID === '') ? (
-                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                  ) : (
-                    ''
-                  )}
-                </div>
-              </div>
-
-            </div>
-
             <div className="row">
               {/* <div className="col-12 col-md-6 mb-2">
                 <div>
@@ -517,46 +645,156 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                 </div>
               </div>
             </div>
-
             <div className="row">
+              <div className="col-12 col-md-6 mb-2">
+                <div>
+                  <label className="form-label">
+                    Select Company
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <div>
+                    <Select
+                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
+                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
 
-
-            </div>
-
-            <div className="row">
-
+                      options={companyOption} placeholder='Select Company' />
+                    {error &&
+                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
+                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label htmlFor="vehicleNumber" className="form-label">
-                    Address
+                    Select Institute
                     <span style={{ color: 'red' }}>*</span>
                   </label>
-                  <textarea
-                    className="form-control"
-                    placeholder="Enter Address"
-                    maxLength={250}
-                    value={employeeObj.address}
-                    onChange={(e) => {
-                      setErrorMessage(false);
-                      let InputValue = e.target.value;
-                      // Updated regex to allow common special characters for addresses
-                      const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
-                      setEmployeeObj((prev) => ({
-                        ...prev,
-                        address: updatedValue
-                      }));
-                    }}
+                  <Select
+                    placeholder="Select Institute"
+                    options={instituteOption}
+                    value={instituteOption.find((option) => option.value === employeeObj.instituteKeyID) || null}
+                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, instituteKeyID: option ? option.value : '' }))}
+                    menuPosition="fixed"
                   />
-                  {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                  {error &&
+                    (employeeObj.instituteKeyID === null || employeeObj.instituteKeyID === undefined || employeeObj.instituteKeyID === '') ? (
                     <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                   ) : (
                     ''
                   )}
                 </div>
               </div>
+              <div className="col-12 col-md-6 mb-2">
+                <div>
+                  <label htmlFor="vehicleNumber" className="form-label">
+                    Select Zone
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <Select
+                    placeholder="Select Zone"
+                    // options={instituteOption}
+                    value={instituteOption.find((option) => option.value === employeeObj.instituteKeyID) || null}
+                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, instituteKeyID: option ? option.value : '' }))}
+                    menuPosition="fixed"
+                  />
+                  {error &&
+                    (employeeObj.instituteKeyID === null || employeeObj.instituteKeyID === undefined || employeeObj.instituteKeyID === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  State
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select
+                  options={stateOption}
+                  value={stateOption.filter((item) => item.value === employeeObj.stateKeyID)}
+                  onChange={handleStateChange}
+                  menuPosition="fixed"
+                />
+                {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
 
+            </div>
+            <div className="row">
 
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  Select   District
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select
+                  options={districtOption}
+                  value={districtOption.filter((item) => item.value === employeeObj.districtKeyID)}
+                  onChange={handleDistrictChange}
+                  menuPosition="fixed"
+                />                {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  Select   Taluka
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select
+                  options={talukaOption}
+                  value={talukaOption.filter((item) => item.value === employeeObj.talukaKeyID)}
+                  onChange={handleTalukaChange}
+                  menuPosition="fixed"
+                />                {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  Select   Village
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select
+                  options={villageOption}
+                  value={villageOption.filter((item) => item.value === employeeObj.villageKeyID)}
+                  onChange={handleVillageChange}
+                  menuPosition="fixed"
+                />                {error && (employeeObj.villageKeyID === null || employeeObj.villageKeyID === undefined || employeeObj.villageKeyID === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  Select   Project
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Select
+                  options={projectOption}
+                  value={projectOption.filter((item) => item.value === employeeObj.projectKeyList)}
+                  onChange={handleProjectChange}
+                  menuPosition="fixed"
+                />                {error && (employeeObj.projectKeyList === null || employeeObj.projectKeyList === undefined || employeeObj.villageKeyID === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
               <div className="col-12 col-md-6 mb-2">
                 <div>
                   <label htmlFor="Password" className="form-label">
@@ -607,7 +845,40 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
 
                 </div>
               </div>
+              <div className="col-12 col-md-6 mb-2">
+                <div>
+                  <label htmlFor="vehicleNumber" className="form-label">
+                    Address
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <textarea
+                    className="form-control"
+                    placeholder="Enter Address"
+                    maxLength={250}
+                    value={employeeObj.address}
+                    onChange={(e) => {
+                      setErrorMessage(false);
+                      let InputValue = e.target.value;
+                      // Updated regex to allow common special characters for addresses
+                      const updatedValue = InputValue.replace(/[^a-zA-Z0-9\s,.-/#&()]/g, '');
+                      setEmployeeObj((prev) => ({
+                        ...prev,
+                        address: updatedValue
+                      }));
+                    }}
+                  />
+                  {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
             </div>
+
+
+
+
 
             <span style={{ color: 'red' }}>{errorMessage}</span>
           </div>

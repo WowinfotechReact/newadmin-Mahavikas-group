@@ -23,12 +23,7 @@ export const GetModelStockModel = async (id) => {
   return res;
 };
 
-export const GetDistrictLookupList = async (stateID) => {
-  const url = `${ModelStockBaseUrl}/GetDistrictLookupList?StateID=${stateID}`;
 
-  const res = await getListWithAuthenticated(url);
-  return res;
-};
 
 export const ChangeDistrictStatus = async (id, UserKeyID) => {
   let url = `${ModelStockBaseUrl}/ChangeDistrictStatus?DistrictID=${id}&UserKeyID=${UserKeyID}`;

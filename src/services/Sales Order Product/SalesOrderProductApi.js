@@ -37,12 +37,6 @@ export const GetSalesOrderProductDetailList = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${SalesOrderProductBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
   
   export const ChangeStateStatus = async (id,UserKeyID) => {
     let url = `${SalesOrderProductBaseUrl}/ChangeStateStatus?StateID=${id}&UserKeyID=${UserKeyID}`;

@@ -27,12 +27,7 @@ export const GetRechargeValidityPlanModel = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${rechargeBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
+
 export const GetRechargeValidityPlanLookupList = async (SimOperatorID) => {
     const url = `${rechargeBaseUrl}/GetRechargeValidityPlanLookupList?SimOperatorID=${SimOperatorID}`;
   

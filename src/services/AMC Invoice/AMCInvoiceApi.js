@@ -32,13 +32,7 @@ export const GetAMCInvoiceModel = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${AMCInvoiceBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
-  
+
   export const ChangeStateStatus = async (id,UserKeyID) => {
     let url = `${AMCInvoiceBaseUrl}/ChangeStateStatus?StateID=${id}&UserKeyID=${UserKeyID}`;
     const res = await getListWithAuthenticated(url);

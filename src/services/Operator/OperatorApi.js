@@ -26,12 +26,7 @@ export const GetSimOperatorModel = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${MasterOperatorBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
+
   
   export const ChangeSimOperatorStatus = async (id,UserKeyID) => {
     let url = `${MasterOperatorBaseUrl}/ChangeSimOperatorStatus?SimOperatorID=${id}&UserKeyID=${UserKeyID}`;

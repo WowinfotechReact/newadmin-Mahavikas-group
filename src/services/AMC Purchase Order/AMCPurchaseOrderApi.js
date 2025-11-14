@@ -32,12 +32,6 @@ export const GetPOModel = async (id) => {
   };
 
 
-export const GetStateLookupList = async () => {
-    const url = `${AMCPurchaseOrderBaseUrl}/GetStateLookupList`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
   
   export const ChangeStateStatus = async (id,UserKeyID) => {
     let url = `${AMCPurchaseOrderBaseUrl}/ChangeStateStatus?StateID=${id}&UserKeyID=${UserKeyID}`;

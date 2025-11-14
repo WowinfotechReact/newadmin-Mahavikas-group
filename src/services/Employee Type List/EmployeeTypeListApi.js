@@ -33,12 +33,7 @@ export const GetEmployeeTypeModel = async (id) => {
   return res;
 };
 
-export const GetTalukaLookupList = async (id) => {
-  const url = `${EmployeeTypeBaseUrl}/GetTalukaLookupList?DistrictID=${id}`;
 
-  const res = await getListWithAuthenticated(url);
-  return res;
-};
 
 
 

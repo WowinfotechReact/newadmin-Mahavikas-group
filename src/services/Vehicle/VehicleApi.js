@@ -31,13 +31,7 @@ export const AddUpdateVehicleApi = async (url = '', params) => {
     };
 
 
-export const GetTalukaLookupList = async (id) => {
-    const url = `${VehicleBaseUrl}/GetTalukaLookupList?DistrictID=${id}`;
-  
-    const res = await getListWithAuthenticated(url );
-    return res;
-  };
-  
+
 export const ChangeVehicleStatus = async (id, UserKeyID) => {
   let url = `${VehicleBaseUrl}/ChangeVehicleStatus?VehicleKeyID=${id}&UserKeyID=${UserKeyID}`;
   const res = await getListWithAuthenticated(url);

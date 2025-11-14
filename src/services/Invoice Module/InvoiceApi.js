@@ -25,12 +25,7 @@ export const GetInvoiceModel = async (id) => {
   return res;
 };
 
-export const GetDistrictLookupList = async (stateID) => {
-  const url = `${InvoiceBaseUrl}/GetDistrictLookupList?StateID=${stateID}`;
 
-  const res = await getListWithAuthenticated(url);
-  return res;
-};
 
 export const ChangeDistrictStatus = async (id, UserKeyID) => {
   let url = `${InvoiceBaseUrl}/ChangeDistrictStatus?DistrictID=${id}&UserKeyID=${UserKeyID}`;

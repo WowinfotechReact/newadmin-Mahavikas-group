@@ -19,10 +19,10 @@ import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { AddUpdateInstitute, GetInstituteModel } from 'services/Institute/InstituteApi';
 import { GetStateLookupList } from 'services/Master Crud/MasterStateApi';
-import { GetDistrictLookupList } from 'services/Master Crud/MasterDistrictApi copy';
-import { GetTalukaLookupList } from 'services/Master Crud/MasterTalukaApi copy';
 import { GetVillageLookupList } from 'services/Master Crud/MasterVillageApi';
-
+import { GetProjectLookupList } from 'services/Project/ProjectApi';
+import { GetDistrictLookupList } from 'services/Master Crud/MasterDistrictApi';
+import { GetTalukaLookupList } from 'services/Master Crud/MasterTalukaApi';
 const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData }) => {
   const [customerOption, setCustomerOption] = useState([]);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
@@ -36,8 +36,8 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
   const [districtOption, setDistrictOption] = useState([]);
   const [talukaOption, setTalukaOption] = useState([]);
   const [villageOption, setVillageOption] = useState([]);
-
-  const [customerObj, setCustomerObj] = useState({
+  const [projectOption, setProjectOption] = useState([])
+  const [instituteObj, setInstituteObj] = useState({
     userKeyID: null,
     instituteKeyID: null,
     instituteName: null,
@@ -88,21 +88,21 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
     // Validation logic
     if (
       (
-        customerObj.instituteName === null ||
-        customerObj.instituteName === undefined ||
-        customerObj.instituteName === '' ||
-        customerObj.stateKeyID === null ||
-        customerObj.stateKeyID === null ||
-        customerObj.stateKeyID === undefined ||
-        customerObj.districtKeyID === undefined ||
-        customerObj.districtKeyID === undefined ||
-        customerObj.districtKeyID === '' ||
-        customerObj.talukaKeyID === '' ||
-        customerObj.talukaKeyID === '' ||
-        customerObj.talukaKeyID === '' ||
-        customerObj.villageKeyID === null ||
-        customerObj.villageKeyID === undefined ||
-        customerObj.villageKeyID === ''
+        instituteObj.instituteName === null ||
+        instituteObj.instituteName === undefined ||
+        instituteObj.instituteName === '' ||
+        instituteObj.stateKeyID === null ||
+        instituteObj.stateKeyID === null ||
+        instituteObj.stateKeyID === undefined ||
+        instituteObj.districtKeyID === undefined ||
+        instituteObj.districtKeyID === undefined ||
+        instituteObj.districtKeyID === '' ||
+        instituteObj.talukaKeyID === '' ||
+        instituteObj.talukaKeyID === '' ||
+        instituteObj.talukaKeyID === '' ||
+        instituteObj.villageKeyID === null ||
+        instituteObj.villageKeyID === undefined ||
+        instituteObj.villageKeyID === ''
       )) {
       setErrors(true);
       isValid = true;
@@ -115,11 +115,11 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
     const jsonData = {
       userKeyID: user.userKeyID,
       instituteKeyID: modelRequestData.instituteKeyID,
-      instituteName: customerObj.instituteName,
-      stateKeyID: customerObj.stateKeyID,
-      districtKeyID: customerObj.districtKeyID,
-      talukaKeyID: customerObj.talukaKeyID,
-      villageKeyID: customerObj.villageKeyID,
+      instituteName: instituteObj.instituteName,
+      stateKeyID: instituteObj.stateKeyID,
+      districtKeyID: instituteObj.districtKeyID,
+      talukaKeyID: instituteObj.talukaKeyID,
+      villageKeyID: instituteObj.villageKeyID,
       projectKeyID: 'CD69643C-CB99-4174-960F-0D053CC6F3BB'
 
     };
@@ -182,7 +182,7 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
         const ModelData = data.data.responseData.data;
 
         // ✅ Directly set entire object — no merge with old state!
-        setCustomerObj({
+        setInstituteObj({
           instituteKeyID: modelRequestData.instituteKeyID,
           instituteName: ModelData.instituteName,
           projectKeyID: ModelData.projectKeyID,
@@ -204,6 +204,29 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
     }
   };
 
+  useEffect(() => {
+    GetProjectLookupListData()
+  }, [])
+  const GetProjectLookupListData = async () => {
+    try {
+      const response = await GetProjectLookupList(); // Ensure this function is imported correctly
+
+      if (response?.data?.statusCode === 200) {
+        const stateLookupList = response?.data?.responseData?.data || [];
+
+        const formattedIvrList = stateLookupList.map((ivrItem) => ({
+          value: ivrItem.projectKeyID,
+          label: ivrItem.projectName
+        }));
+
+        setProjectOption(formattedIvrList); // Make sure you have a state setter function for IVR list
+      } else {
+        console.error('Failed to fetch IVR lookup list:', response?.data?.statusMessage || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching IVR lookup list:', error);
+    }
+  };
   const closeAllModal = () => {
     onHide();
     setShowSuccessModal(false);
@@ -219,21 +242,21 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
 
 
   useEffect(() => {
-    if (customerObj.talukaKeyID !== null && customerObj.talukaKeyID !== undefined) {
+    if (instituteObj.talukaKeyID !== null && instituteObj.talukaKeyID !== undefined) {
       GetVillageLookupListData();
     }
-  }, [customerObj.talukaKeyID]);
+  }, [instituteObj.talukaKeyID]);
   useEffect(() => {
-    if (customerObj.districtKeyID !== null && customerObj.districtKeyID !== undefined) {
+    if (instituteObj.districtKeyID !== null && instituteObj.districtKeyID !== undefined) {
       GetTalukaLookupListData();
     }
-  }, [customerObj.districtKeyID]);
+  }, [instituteObj.districtKeyID]);
 
   useEffect(() => {
-    if (customerObj.stateKeyID !== null && customerObj.stateKeyID !== undefined) {
+    if (instituteObj.stateKeyID !== null && instituteObj.stateKeyID !== undefined) {
       GetDistrictLookupListData();
     }
-  }, [customerObj.stateKeyID]);
+  }, [instituteObj.stateKeyID]);
   const GetStateLookupListData = async () => {
     try {
       const response = await GetStateLookupList(); // Ensure this function is imported correctly
@@ -256,10 +279,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
   };
 
   const GetDistrictLookupListData = async () => {
-    if (customerObj.stateKeyID === null) return;
+    if (instituteObj.stateKeyID === null) return;
 
     try {
-      let response = await GetDistrictLookupList(customerObj?.stateKeyID);
+      let response = await GetDistrictLookupList(instituteObj?.stateKeyID);
       if (response?.data?.statusCode === 200) {
         const cityList = response?.data?.responseData?.data || [];
         const formattedCityList = cityList.map((city) => ({
@@ -277,10 +300,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
   };
 
   const GetTalukaLookupListData = async () => {
-    if (customerObj.districtKeyID === null) return;
+    if (instituteObj.districtKeyID === null) return;
 
     try {
-      let response = await GetTalukaLookupList(customerObj?.districtKeyID);
+      let response = await GetTalukaLookupList(instituteObj?.districtKeyID);
       if (response?.data?.statusCode === 200) {
         const talukaList = response?.data?.responseData?.data || [];
         const formattedCityList = talukaList.map((taluka) => ({
@@ -297,10 +320,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
     }
   };
   const GetVillageLookupListData = async () => {
-    if (customerObj.talukaKeyID === null) return;
+    if (instituteObj.talukaKeyID === null) return;
 
     try {
-      let response = await GetVillageLookupList(customerObj?.talukaKeyID);
+      let response = await GetVillageLookupList(instituteObj?.talukaKeyID);
       if (response?.data?.statusCode === 200) {
         const villageList = response?.data?.responseData?.data || [];
         const formattedCityList = villageList.map((taluka) => ({
@@ -319,7 +342,7 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
 
 
   const handleStateChange = (selectedOption) => {
-    setCustomerObj((prev) => ({
+    setInstituteObj((prev) => ({
       ...prev,
       stateKeyID: selectedOption ? selectedOption.value : null,
       districtKeyID: '',
@@ -327,8 +350,15 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
       // villageName:''
     }));
   };
+  const handleProjectChange = (selectedOption) => {
+    setInstituteObj((prev) => ({
+      ...prev,
+      projectKeyID: selectedOption ? selectedOption.value : null,
+
+    }));
+  };
   const handleDistrictChange = (selectedOption) => {
-    setCustomerObj((prev) => ({
+    setInstituteObj((prev) => ({
       ...prev,
       districtKeyID: selectedOption ? selectedOption.value : null,
       talukaKeyID: '',
@@ -337,14 +367,14 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
   };
 
   const handleTalukaChange = (selectedOption) => {
-    setCustomerObj((prev) => ({
+    setInstituteObj((prev) => ({
       ...prev,
       talukaKeyID: selectedOption ? selectedOption.value : null,
       // villageName:''
     }));
   };
   const handleVillageChange = (selectedOption) => {
-    setCustomerObj((prev) => ({
+    setInstituteObj((prev) => ({
       ...prev,
       villageKeyID: selectedOption ? selectedOption.value : null,
       // villageName:''
@@ -371,7 +401,7 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                   className="form-control"
                   id="customerName"
                   placeholder="Enter Institute Name"
-                  value={customerObj.instituteName}
+                  value={instituteObj.instituteName}
                   onChange={(e) => {
                     let inputVal = e.target.value;
 
@@ -386,11 +416,11 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                       inputVal = inputVal.charAt(0).toUpperCase() + inputVal.slice(1);
                     }
 
-                    setCustomerObj({ ...customerObj, instituteName: inputVal });
+                    setInstituteObj({ ...instituteObj, instituteName: inputVal });
                   }}
 
                 />
-                {error && (!customerObj.instituteName || customerObj.instituteName.trim() === '') && (
+                {error && (!instituteObj.instituteName || instituteObj.instituteName.trim() === '') && (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 )}
               </div>
@@ -406,14 +436,14 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                   className="form-control"
                   id="gstNumber"
                   placeholder="Enter Description Of Institute "
-                  value={customerObj.gstNumber}
+                  value={instituteObj.gstNumber}
                   onChange={(e) => {
                     let gst = e.target.value.toUpperCase(); // Ensure uppercase
                     gst = gst.replace(/^\s+/, ''); // Remove leading spaces
-                    setCustomerObj({ ...customerObj, gstNumber: gst });
+                    setInstituteObj({ ...instituteObj, gstNumber: gst });
                   }}
                 />
-                {error && (customerObj.gstNumber === null || customerObj.gstNumber === undefined || customerObj.gstNumber === '') ? (
+                {error && (instituteObj.gstNumber === null || instituteObj.gstNumber === undefined || instituteObj.gstNumber === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''
@@ -429,11 +459,11 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                 </label>
                 <Select
                   options={stateOption}
-                  value={stateOption.filter((item) => item.value === customerObj.stateKeyID)}
+                  value={stateOption.filter((item) => item.value === instituteObj.stateKeyID)}
                   onChange={handleStateChange}
                   menuPosition="fixed"
                 />
-                {error && (customerObj.address === null || customerObj.address === undefined || customerObj.address === '') ? (
+                {error && (instituteObj.address === null || instituteObj.address === undefined || instituteObj.address === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''
@@ -446,10 +476,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                 </label>
                 <Select
                   options={districtOption}
-                  value={districtOption.filter((item) => item.value === customerObj.districtKeyID)}
+                  value={districtOption.filter((item) => item.value === instituteObj.districtKeyID)}
                   onChange={handleDistrictChange}
                   menuPosition="fixed"
-                />                {error && (customerObj.address === null || customerObj.address === undefined || customerObj.address === '') ? (
+                />                {error && (instituteObj.address === null || instituteObj.address === undefined || instituteObj.address === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''
@@ -462,10 +492,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                 </label>
                 <Select
                   options={talukaOption}
-                  value={talukaOption.filter((item) => item.value === customerObj.talukaKeyID)}
+                  value={talukaOption.filter((item) => item.value === instituteObj.talukaKeyID)}
                   onChange={handleTalukaChange}
                   menuPosition="fixed"
-                />                {error && (customerObj.address === null || customerObj.address === undefined || customerObj.address === '') ? (
+                />                {error && (instituteObj.address === null || instituteObj.address === undefined || instituteObj.address === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''
@@ -478,10 +508,10 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                 </label>
                 <Select
                   options={villageOption}
-                  value={villageOption.filter((item) => item.value === customerObj.villageKeyID)}
+                  value={villageOption.filter((item) => item.value === instituteObj.villageKeyID)}
                   onChange={handleVillageChange}
                   menuPosition="fixed"
-                />                {error && (customerObj.address === null || customerObj.address === undefined || customerObj.address === '') ? (
+                />                {error && (instituteObj.address === null || instituteObj.address === undefined || instituteObj.address === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''
@@ -492,8 +522,13 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                   Select Project
                   {/* <span style={{ color: 'red' }}>*</span> */}
                 </label>
-                <Select options={projectOptions()} placeholder='Select  Project' className="user-role-select phone-input-country-code" />
-                {error && (customerObj.address === null || customerObj.address === undefined || customerObj.address === '') ? (
+                <Select
+                  options={projectOption}
+                  value={projectOption.filter((item) => item.value === instituteObj.projectKeyID)}
+                  onChange={handleProjectChange}
+                  menuPosition="fixed"
+                />
+                {error && (employeeObj.projectKeyID === null || employeeObj.projectKeyID === undefined || employeeObj.villageKeyID === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''

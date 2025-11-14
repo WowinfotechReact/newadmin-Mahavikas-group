@@ -20,12 +20,14 @@ export const AddUpdateInstitute = async (url = '', params) => {
   return res;
 };
 
-export const GetEmployeeLookupList = async (params) => {
-  
-  const res = await postApiWithAuthenticated(`${InstituteBaseURI}${'/GetEmployeeLookupList'}`, params);
+
+
+export const GetInstituteLookupList = async () => {
+  const url = `${InstituteBaseURI}/GetInstituteLookupList`;
+
+  const res = await getListWithAuthenticated(url);
   return res;
 };
-
 
 export const GetInstituteModel = async (id) => {
   let url = `${InstituteBaseURI}/GetInstituteModel?InstituteKeyID=${id}`;
