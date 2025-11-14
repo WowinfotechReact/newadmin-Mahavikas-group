@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import SuccessPopupModal from 'component/SuccessPopupModal';
-import { AddUpdateProductApi, GetProductModel } from 'services/Product/ProductApi';
 import { ConfigContext } from 'context/ConfigContext';
 import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import DatePicker from 'react-date-picker';
@@ -9,6 +8,8 @@ import Select from 'react-select';
 
 import 'react-calendar/dist/Calendar.css';
 import 'react-date-picker/dist/DatePicker.css';
+import { GetServiceLookupList } from 'services/Services/ServicesApi';
+import { AddUpdateProject, GetProjectModel } from 'services/Project/ProjectApi';
 
 const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData }) => {
   const [modelAction, setModelAction] = useState('');
@@ -16,25 +17,50 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
   const { setLoader, user } = useContext(ConfigContext);
+  const [servicesOption, setServicesOption] = useState([])
   const [productObj, setProductObj] = useState({
     userKeyID: null,
-    productKeyID: null,
-    productName: null,
-    hsn: '',
-    gstPercentage: ''
+    projectKeyID: null,
+    projectName: null,
+    projectDescription: null,
+    serviceKeyID: null
   });
 
   useEffect(() => {
     if (modelRequestData?.Action === 'Update') {
-      if (modelRequestData?.productKeyID !== null) {
-        GetProductModelData(modelRequestData.productKeyID);
+      if (modelRequestData?.projectKeyID !== null) {
+        GetProjectModelData(modelRequestData.projectKeyID);
       }
     }
   }, [modelRequestData?.Action]);
 
+  useEffect(() => {
+    GetServiceLookupListData()
+  }, [])
+  const GetServiceLookupListData = async () => {
+    try {
+      const response = await GetServiceLookupList(); // Ensure this function is imported correctly
+
+      if (response?.data?.statusCode === 200) {
+        const stateLookupList = response?.data?.responseData?.data || [];
+
+        const formattedIvrList = stateLookupList.map((ivrItem) => ({
+          value: ivrItem.serviceKeyID,
+          label: ivrItem.serviceName
+        }));
+
+        setServicesOption(formattedIvrList); // Make sure you have a state setter function for IVR list
+      } else {
+        console.error('Failed to fetch IVR lookup list:', response?.data?.statusMessage || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching IVR lookup list:', error);
+    }
+  };
+
   const AddProductBtnClick = () => {
     let isValid = false;
-    if (productObj.productName === null || productObj.productName === undefined || productObj.productName.trim() === '') {
+    if (productObj.projectName === null || productObj.projectName === undefined || productObj.projectName.trim() === '') {
       setErrors(true);
       isValid = true;
     } else {
@@ -44,23 +70,30 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
 
     const apiParam = {
       userKeyID: user.userKeyID,
-      productName: productObj?.productName,
-      productKeyID: modelRequestData?.productKeyID,
-      hsn: productObj?.hsn,
-      gstPercentage: parseFloat(productObj?.gstPercentage)
+      projectName: productObj?.projectName,
+      projectKeyID: modelRequestData?.projectKeyID,
+      projectDescription: productObj?.projectDescription,
+      serviceKeyID: productObj?.serviceKeyID,
     };
 
     if (!isValid) {
-      AddUpdateProductData(apiParam);
+      AddUpdateProjectData(apiParam);
     }
   };
+  const handleServiceChange = (selectedOption) => {
+    setProductObj((prev) => ({
+      ...prev,
+      serviceKeyID: selectedOption ? selectedOption.value : null,
 
-  const AddUpdateProductData = async (apiParam) => {
+    }));
+  };
+  const AddUpdateProjectData = async (apiParam) => {
     setLoader(true);
     try {
-      let url = '/AddUpdateProduct';
+      let url = '/AddUpdateProject';
 
-      const response = await AddUpdateProductApi(url, apiParam);
+
+      const response = await AddUpdateProject(url, apiParam);
       if (response) {
         if (response?.data?.statusCode === 200) {
           setLoader(false);
@@ -88,14 +121,14 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
     setShowSuccessModal(false);
   };
 
-  const GetProductModelData = async (id) => {
+  const GetProjectModelData = async (id) => {
     if (id === undefined) {
       return;
     }
     setLoader(true);
 
     try {
-      const data = await GetProductModel(id);
+      const data = await GetProjectModel(id);
       if (data?.data?.statusCode === 200) {
         setLoader(false);
         const ModelData = data.data.responseData.data;
@@ -103,10 +136,10 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
         setProductObj({
           ...productObj,
           userKeyID: ModelData.userKeyID,
-          productKeyID: modelRequestData.productKeyID,
-          productName: ModelData.productName,
-          hsn: ModelData.hsn,
-          gstPercentage: ModelData.gstPercentage
+          projectKeyID: modelRequestData.projectKeyID,
+          projectName: ModelData.projectName,
+          projectDescription: ModelData.projectDescription,
+          serviceKeyID: ModelData.serviceKeyID
         });
       } else {
         setLoader(false);
@@ -147,7 +180,7 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
                   id="ProductName"
                   placeholder="Enter Project Name"
                   aria-describedby="Product"
-                  value={productObj.productName}
+                  value={productObj.projectName}
                   onChange={(e) => {
                     setErrorMessage(false);
                     let inputValue = e.target.value;
@@ -165,11 +198,11 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
 
                     setProductObj((prev) => ({
                       ...prev,
-                      productName: updatedValue
+                      projectName: updatedValue
                     }));
                   }}
                 />
-                {error && !productObj.productName && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
+                {error && !productObj.projectName && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
                 {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
               </div>
 
@@ -179,25 +212,33 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
                   Project Description
                 </label>
                 <textarea
-                  maxLength={2000}
+                  maxLength={700}
                   type="text"
                   className="form-control"
                   id="HSN"
                   placeholder="Enter Project Description"
-                  value={productObj.hsn}
+                  value={productObj.projectDescription}
                   onChange={(e) => {
-                    const cleaned = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
-                    setProductObj((prev) => ({ ...prev, hsn: cleaned }));
+                    setProductObj((prev) => ({
+                      ...prev,
+                      projectDescription: e.target.value
+                    }));
                   }}
                 />
+
               </div>
 
               <div className="mb-3">
                 <label htmlFor="ProductName" className="form-label">
                   Select Services<span style={{ color: 'red' }}>*</span>
                 </label>
-                <Select options={serviceOption} placeholder='Select Services' />
-                {error && !productObj.productName && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
+                <Select
+                  options={servicesOption}
+                  value={servicesOption.filter((item) => item.value === productObj.serviceKeyID)}
+                  onChange={handleServiceChange}
+                  menuPosition="fixed"
+                />
+                {error && !productObj.serviceKeyID && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
                 {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
               </div>
 

@@ -6,16 +6,16 @@ import NoResultFoundModel from 'component/NoResultFoundModal';
 import PaginationComponent from 'component/Pagination';
 import { Tooltip } from '@mui/material';
 import ProductAddUpdateModal from './ProductAddUpdateModal';
-import { GetProductList, ChangeProductStatus } from 'services/Product/ProductApi';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router';
 import StatusChangeModal from 'component/StatusChangeModal ';
 import { hasPermission } from 'Middleware/permissionUtils';
+import { ChangeProjectStatus, GetProjectList } from 'services/Project/ProjectApi';
 
 const ProductList = () => {
   const { setLoader, user, permissions } = useContext(ConfigContext);
   const navigate = useNavigate();
-
+  const [productListData, setProductListData] = useState([])
   const [stateChangeStatus, setStateChangeStatus] = useState('');
   const [modelAction, setModelAction] = useState();
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,15 +36,15 @@ const ProductList = () => {
   const [totalCount, setTotalCount] = useState(0);
 
   const [modelRequestData, setModelRequestData] = useState({
-    productKeyID: null,
+    projectKeyID: null,
     Action: null
   });
 
   // Main fetcher
-  const GetProductListData = async (pageNumber, searchKeywordValue, toDateParam, fromDateParam, sortValue, ProductSortType) => {
+  const GetProjectListData = async (pageNumber, searchKeywordValue, toDateParam, fromDateParam, sortValue, ProductSortType) => {
     setLoader(true);
     try {
-      const data = await GetProductList({
+      const data = await GetProjectList({
         pageSize,
         pageNo: pageNumber - 1,
         searchKeyword: searchKeywordValue ?? searchKeyword,
@@ -64,7 +64,7 @@ const ProductList = () => {
 
         // Auto back if empty but data exists
         if (ProductData.length === 0 && totalItems > 0 && pageNumber > 1) {
-          GetProductListData(pageNumber - 1);
+          GetProjectListData(pageNumber - 1);
           setCurrentPage(pageNumber - 1);
         } else {
           setCurrentPage(pageNumber);
@@ -83,9 +83,9 @@ const ProductList = () => {
   useEffect(() => {
     if (isAddUpdateActionDone) {
       if (lastActionType === 'Add') {
-        GetProductListData(1);
+        GetProjectListData(1);
       } else {
-        GetProductListData(currentPage);
+        GetProjectListData(currentPage);
       }
       setIsAddUpdateActionDone(false);
       setLastActionType(null);
@@ -94,28 +94,26 @@ const ProductList = () => {
 
   // Initial fetch
   useEffect(() => {
-    GetProductListData(1);
+    GetProjectListData(1);
   }, []);
 
   const handleSearch = (e) => {
     const value = e.target.value.trimStart();
     const formatted = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
     setSearchKeyword(formatted);
-    GetProductListData(1, formatted);
+    GetProjectListData(1, formatted);
   };
 
-  const handlePageChange = (pageNumber) => {
-    GetProductListData(pageNumber);
-  };
+
 
   const addProductBtnClick = () => {
-    setModelRequestData({ Action: null, productKeyID: null });
+    setModelRequestData({ Action: null, projectKeyID: null });
     setLastActionType('Add');
     setOpenProductModal(true);
   };
 
   const editProductBtnClick = (row) => {
-    setModelRequestData({ Action: 'Update', productKeyID: row.productKeyID });
+    setModelRequestData({ Action: 'Update', projectKeyID: row.projectKeyID });
     setLastActionType('Update');
     setOpenProductModal(true);
   };
@@ -127,12 +125,12 @@ const ProductList = () => {
 
   const confirmStatusChange = async () => {
     try {
-      const { productKeyID } = stateChangeStatus;
-      const response = await ChangeProductStatus(productKeyID, user.userKeyID);
+      const { projectKeyID } = stateChangeStatus;
+      const response = await ChangeProjectStatus(projectKeyID);
 
       if (response?.data?.statusCode === 200) {
         setShowStatusChangeModal(false);
-        GetProductListData(currentPage);
+        GetProjectListData(currentPage);
         setShowSuccessModal(true);
         setModelAction('Project status changed successfully.');
       } else {
@@ -152,7 +150,7 @@ const ProductList = () => {
     if (ProductSortType === 'productName') {
       setSortingDirection(newSortValue);
       setSortDirectionObj({ ...sortDirectionObj, ProductNameSort: newSortValue });
-      GetProductListData(1, searchKeyword, toDate, fromDate, newSortValue, ProductSortType);
+      GetProjectListData(1, searchKeyword, toDate, fromDate, newSortValue, ProductSortType);
     }
   };
 
@@ -169,7 +167,7 @@ const ProductList = () => {
   const openModelList = (row) => {
     navigate('/model-list', {
       state: {
-        productKeyID: row.productKeyID,
+        projectKeyID: row.projectKeyID,
         productName: row.productName,
         hsn: row.hsn,
         gstPercentage: row.gstPercentage
@@ -223,26 +221,36 @@ const ProductList = () => {
                 <tr>
                   <th className="text-center">Sr No</th>
                   <th className="text-center">Project Name</th>
-                  <th className="text-center">Start Date </th>
-                  <th className="text-center">End Date</th>
+                  <th className="text-center">Project Description </th>
+                  <th className="text-center">Service Name</th>
                   <th className="text-center">Status</th>
                   <th className="text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {dataMap?.map((row, idx) => (
+                {productListData?.map((row, idx) => (
                   <tr key={idx}>
                     <td className="text-center">{(currentPage - 1) * pageSize + idx + 1}</td>
                     <td className="text-center">{row.projectName}</td>
-                    <td className="text-center">{'22-05-2025'}</td>
-                    <td className="text-center">{'27-06-2026'}</td>
+                    <td className="text-center">
+
+                      {row.projectDescription?.length > 30 ? (
+                        <Tooltip title={row.projectDescription}>{`${row.projectDescription?.substring(0, 30)}...`}</Tooltip>
+                      ) : (
+                        <>{row.projectDescription}</>
+                      )}
+                    </td>
+                    <td className="text-center">{row.serviceName}</td>
 
                     <td className="text-center">
-                      <Tooltip title={row.status}>
-                        {row.status}
-                      </Tooltip>
+                      {row.status === 'Active' ? 'Active' : 'In-Active'}
+                      <Android12Switch style={{ padding: '8px' }}
+                        onClick={() => handleStatusChange(row)} checked={row.status === 'Active'} />
+
+
                     </td>
-                    <td className="text-center">
+                    <td className="text-center relative  actionColSticky " style={{ zIndex: 4 }}>
+
                       <div className="d-flex justify-content-center gap-2">
                         <Tooltip title="Update Project">
                           <button

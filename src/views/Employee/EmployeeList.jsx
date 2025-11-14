@@ -434,7 +434,7 @@ const EmployeeList = () => {
 
                   <th className="text-center">Address</th>
                   <th className="text-center">Company Name</th>
-                  <th className="text-center">Action</th>
+                  <th className="text-center actionSticky">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -486,8 +486,8 @@ const EmployeeList = () => {
 
 
 
+                    <td className="text-center relative  actionColSticky " style={{ zIndex: 4 }}>
 
-                    <td className="text-center">
 
                       <div className="">
 

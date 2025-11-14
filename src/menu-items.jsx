@@ -2,6 +2,7 @@
 import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
@@ -92,6 +93,7 @@ const icons = {
   HomeOutlinedIcon: HomeOutlinedIcon,
   ChromeReaderModeOutlinedIcon: ChromeReaderModeOutlinedIcon,
   HelpOutlineOutlinedIcon: HelpOutlineOutlinedIcon,
+  AdminPanelSettingsIcon: AdminPanelSettingsIcon,
   KeyIcon: KeyIcon,
   AccountTreeIcon: AccountTreeIcon,
   AccountTreeOutlinedIcon: AccountTreeOutlinedIcon,
@@ -170,6 +172,14 @@ export default {
           type: 'item',
           icon: icons['HomeOutlinedIcon'],
           url: '/'
+        },
+        {
+          id: 'employee',
+          moduleName: 'Employee',
+          title: 'Admin Employee ',
+          type: 'item',
+          icon: icons['AdminPanelSettingsIcon'],
+          url: '/admin-employee'
         },
         {
           id: 'employee',

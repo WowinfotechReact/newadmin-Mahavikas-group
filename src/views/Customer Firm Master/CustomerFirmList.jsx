@@ -308,7 +308,7 @@ const CustomerFirmList = () => {
                   <th className="text-center">District</th>
                   <th className="text-center">Taluka</th>
                   <th className="text-center">Village</th>
-                  <th className="text-center">Action</th>
+                  <th className="text-center actionSticky">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -356,7 +356,8 @@ const CustomerFirmList = () => {
 
 
                     {/* <td className="text-center">{row.createdOnDate ? dayjs(row.createdOnDate).format('DD/MM/YYYY') : '-'}</td> */}
-                    <td className="text-center">
+                    <td className="text-center relative  actionColSticky " style={{ zIndex: 4 }}>
+
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                         <Tooltip title="Update Institute     ">
                           <button

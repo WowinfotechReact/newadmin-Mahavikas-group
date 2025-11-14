@@ -24,6 +24,7 @@ import MasterServiceList from 'views/Master Crud/Master Service/MasterServiceLis
 import SiteEngineerReport from 'views/Reports/SiteEngineerReport';
 import ZoneManager from 'views/Master Crud/Zone Master/ZoneAssignedList';
 import InstituteEmployeeList from 'views/Customer Firm Master/Institute Employee/InstituteEmployeeList';
+import AdminEmployeeList from 'views/Admin Employee/AdminEmployeeList';
 const Profile = Loadable(lazy(() => import('Profile')));
 const EmployeeList = Loadable(lazy(() => import('views/Employee/EmployeeList')));
 const CustomerFirmList = Loadable(lazy(() => import('views/Customer Firm Master/CustomerFirmList')));
@@ -180,6 +181,14 @@ const MainRoutes = {
       element: (
         <Suspense fallback={<Loader />}>
           <ZoneManager />
+        </Suspense>
+      )
+    },
+    {
+      path: '/admin-employee',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <AdminEmployeeList />
         </Suspense>
       )
     },

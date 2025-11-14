@@ -35,8 +35,8 @@ export const GetProductLookupList = async () => {
     return res;
   };
   
-  export const ChangeProductStatus = async (id,UserKeyID) => {
-    let url = `${ProductBaseUrl}/ChangeProductStatus?ProductKeyID=${id}&UserKeyID=${UserKeyID}`;
+  export const ChangeProjectStatus = async (id,UserKeyID) => {
+    let url = `${ProductBaseUrl}/ChangeProjectStatus?ProjectKeyID=${id}&`;
     const res = await getListWithAuthenticated(url);
     return res;
   };

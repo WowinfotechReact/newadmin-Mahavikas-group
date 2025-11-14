@@ -29,7 +29,7 @@ const Default = () => {
   const theme = useTheme();
   const { setLoader, user, companyID } = useContext(ConfigContext);
 
-  console.log(user, '333333swsssssss')
+  console.log(companyID, '333333swsssssss')
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
@@ -162,7 +162,7 @@ const Default = () => {
           <div className="brand d-flex align-items-center gap-3">
             <div className="brand-logo">🏛️</div>
             <div>
-              <h4 className="mb-0">Gov Dashboard</h4>
+              <h4 className="mb-0">{ } Dashboard</h4>
               <small className="text-muted">{user?.companyName} — Administrative Panel</small>
             </div>
           </div>
