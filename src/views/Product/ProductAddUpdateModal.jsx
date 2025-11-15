@@ -10,14 +10,20 @@ import 'react-calendar/dist/Calendar.css';
 import 'react-date-picker/dist/DatePicker.css';
 import { GetServiceLookupList } from 'services/Services/ServicesApi';
 import { AddUpdateProject, GetProjectModel } from 'services/Project/ProjectApi';
+import { GetCompanyLookupList } from 'services/Company/CompanyApi';
 
 const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData }) => {
   const [modelAction, setModelAction] = useState('');
   const [error, setErrors] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
-  const { setLoader, user } = useContext(ConfigContext);
+  const { setLoader, user, companyID } = useContext(ConfigContext);
   const [servicesOption, setServicesOption] = useState([])
+  const [companyOption, setCompanyOption] = useState([])
+  const [zoneOption, setZoneOption] = useState([]);
+  const [districtOption, setDistrictOption] = useState([]);
+  const [talukaOption, setTalukaOption] = useState([]);
+
   const [productObj, setProductObj] = useState({
     userKeyID: null,
     projectKeyID: null,
@@ -58,6 +64,31 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
     }
   };
 
+  useEffect(() => {
+    GetCompanyLookupListData()
+
+  }, [])
+  const GetCompanyLookupListData = async () => {
+    try {
+      const response = await GetCompanyLookupList(); // Ensure this function is imported correctly
+
+      if (response?.data?.statusCode === 200) {
+        const stateLookupList = response?.data?.responseData?.data || [];
+
+        const formattedIvrList = stateLookupList.map((ivrItem) => ({
+          value: ivrItem.serviceKeyID,
+          label: ivrItem.serviceName
+        }));
+
+        setServicesOption(formattedIvrList); // Make sure you have a state setter function for IVR list
+      } else {
+        console.error('Failed to fetch IVR lookup list:', response?.data?.statusMessage || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching IVR lookup list:', error);
+    }
+  };
+
   const AddProductBtnClick = () => {
     let isValid = false;
 
@@ -78,6 +109,7 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
       projectKeyID: modelRequestData?.projectKeyID,
       projectDescription: productObj?.projectDescription,
       serviceKeyID: productObj?.serviceKeyID,
+      companyKeyID: companyID,
     };
 
     if (!isValid) {
@@ -159,6 +191,24 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
     { value: '2', label: 'Teaching' },
     { value: '3', label: 'Nursing' },
   ]
+
+
+  const handleDistrictChange = (selectedOption) => {
+    setProductObj((prev) => ({
+      ...prev,
+      districtKeyID: selectedOption ? selectedOption.value : null,
+      talukaKeyID: '',
+      // villageName:''
+    }));
+  };
+
+  const handleTalukaChange = (selectedOption) => {
+    setProductObj((prev) => ({
+      ...prev,
+      talukaKeyID: selectedOption ? selectedOption.value : null,
+      // villageName:''
+    }));
+  };
   return (
     <>
       <Modal size="md" show={show} style={{ zIndex: 1300 }} onHide={onHide} backdrop="static" keyboard={false} centered>
@@ -233,20 +283,80 @@ const AddUpdateProductModal = ({ show, onHide, setIsAddUpdateActionDone, modelRe
 
               </div>
 
-              <div className="mb-3">
-                <label htmlFor="ProductName" className="form-label">
-                  Select Services<span style={{ color: 'red' }}>*</span>
-                </label>
-                <Select
-                  options={servicesOption}
-                  value={servicesOption.filter((item) => item.value === productObj.serviceKeyID)}
-                  onChange={handleServiceChange}
-                  menuPosition="fixed"
-                />
-                {error && !productObj.serviceKeyID && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
-                {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
-              </div>
 
+
+              <div className="row">
+
+                <div className="col-md-6 mb-3">                  <div>
+                  <label htmlFor="vehicleNumber" className="form-label">
+                    Select Zone
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <Select
+                    placeholder="Select Zone"
+                    options={zoneOption}
+                    value={zoneOption.find((option) => option.value === productObj.zoneKeyList) || null}
+                    onChange={(option) => setProductObj((prev) => ({ ...prev, zoneKeyList: option ? option.value : '' }))}
+                    menuPosition="fixed"
+                  />
+                  {error &&
+                    (productObj.zoneKeyList === null || productObj.zoneKeyList === undefined || productObj.zoneKeyList === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+                </div>
+
+                <div className="col-md-6 mb-3">                  <label htmlFor="customerAddress" className="form-label">
+                  Select District
+                  <span style={{ color: 'red' }}>*</span>
+                </label>
+                  <Select
+                    options={districtOption}
+                    value={districtOption.filter((item) => item.value === productObj.districtKeyID)}
+                    onChange={handleDistrictChange}
+                    menuPosition="fixed"
+                  />                {error && (productObj.address === null || productObj.address === undefined || productObj.address === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="customerAddress" className="form-label">
+                    Select Taluka
+                    <span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <Select
+                    options={talukaOption}
+                    value={talukaOption.filter((item) => item.value === productObj.talukaKeyID)}
+                    onChange={handleTalukaChange}
+                    menuPosition="fixed"
+                  />                {error && (productObj.address === null || productObj.address === undefined || productObj.address === '') ? (
+                    <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                  ) : (
+                    ''
+                  )}
+                </div>
+
+
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="ProductName" className="form-label">
+                    Select Services<span style={{ color: 'red' }}>*</span>
+                  </label>
+                  <Select
+                    options={servicesOption}
+                    value={servicesOption.filter((item) => item.value === productObj.serviceKeyID)}
+                    onChange={handleServiceChange}
+                    menuPosition="fixed"
+                  />
+                  {error && !productObj.serviceKeyID && <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>}
+                  {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
+                </div>
+              </div>
               {/* GST Percentage */}
               <div className="row">
                 <div className="col-md-6 mb-3">

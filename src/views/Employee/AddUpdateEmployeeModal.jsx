@@ -22,6 +22,8 @@ import { GetDistrictLookupList } from 'services/Master Crud/MasterDistrictApi';
 import { GetTalukaLookupList } from 'services/Master Crud/MasterTalukaApi';
 import { GetVillageLookupList } from 'services/Master Crud/MasterVillageApi';
 import { GetProjectLookupList } from 'services/Project/ProjectApi';
+import { AddUpdateAppUser } from 'services/Employee Staff/EmployeeApi';
+import { GetZoneLookupList } from 'services/Master Crud/MasterZoneApi';
 
 const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData, }) => {
   const [customerOption, setCustomerOption] = useState([]);
@@ -58,8 +60,6 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
   const [projectOption, setProjectOption] = useState([]);
   const [districtOption, setDistrictOption] = useState([]);
   const [talukaOption, setTalukaOption] = useState([]);
-  const [villageOption, setVillageOption] = useState([]);
-  const [designationOption, setDesignationOption] = useState([]);
   const [companyOption, setCompanyOption] = useState([]);
   const [instituteOption, setInstituteOption] = useState([]);
   const [zoneOption, setZoneOption] = useState([]);
@@ -209,18 +209,22 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       emailID: employeeObj.emailID,
       password: employeeObj.password,
       address: employeeObj.address,
-      companyKeyID: employeeObj.companyKeyID,
+      companyKeyID: companyID,
+      zoneKeyList: employeeObj.zoneKeyList,
+      districtKeyList: employeeObj.districtKeyList,
+      talukaKeyList: employeeObj.talukaKeyList,
+      projectKeyList: employeeObj.projectKeyList
     };
     if (!isValid) {
-      AddUpdateEmployeeData(apiParam);
+      AddUpdateAppUserData(apiParam);
     }
   };
 
-  const AddUpdateEmployeeData = async (apiParam) => {
+  const AddUpdateAppUserData = async (apiParam) => {
     try {
-      let url = '/AddUpdateAdminUser'; // Default URL for Adding Data
+      let url = '/AddUpdateAppUser'; // Default URL for Adding Data
 
-      const response = await AddUpdateAdminUser(url, apiParam);
+      const response = await AddUpdateAppUser(url, apiParam);
       if (response) {
         if (response?.data?.statusCode === 200) {
 
@@ -372,6 +376,29 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
     }
   };
 
+  useEffect(() => {
+    GetZoneLookupListData()
+  }, [])
+  const GetZoneLookupListData = async () => {
+
+    try {
+      let response = await GetZoneLookupList();
+      if (response?.data?.statusCode === 200) {
+        const villageList = response?.data?.responseData?.data || [];
+        const formattedCityList = villageList.map((taluka) => ({
+          value: taluka.villageKeyID,
+          label: taluka.villageName
+        }));
+
+        setZoneOption(formattedCityList); // Ensure this is called with correct data
+      } else {
+        console.error('Bad request');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const closeAllModal = () => {
     onHide();
@@ -427,13 +454,15 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
       // villageName:''
     }));
   };
-  const handleProjectChange = (selectedOption) => {
+  const handleProjectChange = (selectedOptions) => {
+    const values = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+
     setEmployeeObj((prev) => ({
       ...prev,
-      projectKeyList: selectedOption ? selectedOption.value : null,
-
+      projectKeyList: values,
     }));
   };
+
 
 
   return (
@@ -646,27 +675,7 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
               </div>
             </div>
             <div className="row">
-              <div className="col-12 col-md-6 mb-2">
-                <div>
-                  <label className="form-label">
-                    Select Company
-                    <span style={{ color: 'red' }}>*</span>
-                  </label>
-                  <div>
-                    <Select
-                      value={companyOption.find((option) => option.value === employeeObj.companyKeyID) || null}
-                      onChange={(option) => setEmployeeObj((prev) => ({ ...prev, companyKeyID: option ? option.value : '' }))}
 
-                      options={companyOption} placeholder='Select Company' />
-                    {error &&
-                      (employeeObj.companyKeyID === null || employeeObj.companyKeyID === undefined || employeeObj.companyKeyID === '') ? (
-                      <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
 
 
               <div className="col-12 col-md-6 mb-2">
@@ -677,40 +686,19 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                   </label>
                   <Select
                     placeholder="Select Zone"
-                    // options={instituteOption}
-                    value={instituteOption.find((option) => option.value === employeeObj.instituteKeyID) || null}
-                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, instituteKeyID: option ? option.value : '' }))}
+                    options={zoneOption}
+                    value={zoneOption.find((option) => option.value === employeeObj.zoneKeyList) || null}
+                    onChange={(option) => setEmployeeObj((prev) => ({ ...prev, zoneKeyList: option ? option.value : '' }))}
                     menuPosition="fixed"
                   />
                   {error &&
-                    (employeeObj.instituteKeyID === null || employeeObj.instituteKeyID === undefined || employeeObj.instituteKeyID === '') ? (
+                    (employeeObj.zoneKeyList === null || employeeObj.zoneKeyList === undefined || employeeObj.zoneKeyList === '') ? (
                     <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                   ) : (
                     ''
                   )}
                 </div>
               </div>
-              <div className="col-12 col-md-6 mb-2">
-                <label htmlFor="customerAddress" className="form-label">
-                  State
-                  <span style={{ color: 'red' }}>*</span>
-                </label>
-                <Select
-                  options={stateOption}
-                  value={stateOption.filter((item) => item.value === employeeObj.stateKeyID)}
-                  onChange={handleStateChange}
-                  menuPosition="fixed"
-                />
-                {error && (employeeObj.address === null || employeeObj.address === undefined || employeeObj.address === '') ? (
-                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                ) : (
-                  ''
-                )}
-              </div>
-
-            </div>
-            <div className="row">
-
               <div className="col-12 col-md-6 mb-2">
                 <label htmlFor="customerAddress" className="form-label">
                   Select   District
@@ -727,6 +715,11 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                   ''
                 )}
               </div>
+
+            </div>
+            <div className="row">
+
+
               <div className="col-12 col-md-6 mb-2">
                 <label htmlFor="customerAddress" className="form-label">
                   Select   Taluka
@@ -743,33 +736,21 @@ const AddUpdateEmployeeModal = ({ show, onHide, setIsAddUpdateActionDone, modelR
                   ''
                 )}
               </div>
+
               <div className="col-12 col-md-6 mb-2">
                 <label htmlFor="customerAddress" className="form-label">
-                  Select   Village
-                  <span style={{ color: 'red' }}>*</span>
-                </label>
-                <Select
-                  options={villageOption}
-                  value={villageOption.filter((item) => item.value === employeeObj.villageKeyID)}
-                  onChange={handleVillageChange}
-                  menuPosition="fixed"
-                />                {error && (employeeObj.villageKeyID === null || employeeObj.villageKeyID === undefined || employeeObj.villageKeyID === '') ? (
-                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                ) : (
-                  ''
-                )}
-              </div>
-              <div className="col-12 col-md-6 mb-2">
-                <label htmlFor="customerAddress" className="form-label">
-                  Select   Project
+                  Select Project
                   <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Select
                   options={projectOption}
-                  value={projectOption.filter((item) => item.value === employeeObj.projectKeyList)}
+                  isMulti
+                  value={projectOption.filter(item =>
+                    employeeObj.projectKeyList?.includes(item.value)
+                  )}
                   onChange={handleProjectChange}
                   menuPosition="fixed"
-                />                {error && (employeeObj.projectKeyList === null || employeeObj.projectKeyList === undefined || employeeObj.villageKeyID === '') ? (
+                />           {error && (employeeObj.projectKeyList === null || employeeObj.projectKeyList === undefined || employeeObj.villageKeyID === '') ? (
                   <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
                 ) : (
                   ''

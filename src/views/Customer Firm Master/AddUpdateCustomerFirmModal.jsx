@@ -454,10 +454,28 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
             <div className="row">
               <div className="col-12 col-md-6 mb-2">
                 <label htmlFor="customerAddress" className="form-label">
-                  State
+                  Select Project
+                  {/* <span style={{ color: 'red' }}>*</span> */}
+                </label>
+                <Select
+                  options={projectOption}
+                  value={projectOption.filter((item) => item.value === instituteObj.projectKeyID)}
+                  onChange={handleProjectChange}
+                  menuPosition="fixed"
+                />
+                {error && (employeeObj.projectKeyID === null || employeeObj.projectKeyID === undefined || employeeObj.villageKeyID === '') ? (
+                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
+                ) : (
+                  ''
+                )}
+              </div>
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="customerAddress" className="form-label">
+                  Select Zone
                   <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Select
+                  placeholder='Select Zone'
                   options={stateOption}
                   value={stateOption.filter((item) => item.value === instituteObj.stateKeyID)}
                   onChange={handleStateChange}
@@ -501,39 +519,8 @@ const AddUpdateCustomerFirmModal = ({ show, onHide, setIsAddUpdateActionDone, mo
                   ''
                 )}
               </div>
-              <div className="col-12 col-md-6 mb-2">
-                <label htmlFor="customerAddress" className="form-label">
-                  Select   Village
-                  <span style={{ color: 'red' }}>*</span>
-                </label>
-                <Select
-                  options={villageOption}
-                  value={villageOption.filter((item) => item.value === instituteObj.villageKeyID)}
-                  onChange={handleVillageChange}
-                  menuPosition="fixed"
-                />                {error && (instituteObj.address === null || instituteObj.address === undefined || instituteObj.address === '') ? (
-                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                ) : (
-                  ''
-                )}
-              </div>
-              <div className="col-12 col-md-6 mb-2">
-                <label htmlFor="customerAddress" className="form-label">
-                  Select Project
-                  {/* <span style={{ color: 'red' }}>*</span> */}
-                </label>
-                <Select
-                  options={projectOption}
-                  value={projectOption.filter((item) => item.value === instituteObj.projectKeyID)}
-                  onChange={handleProjectChange}
-                  menuPosition="fixed"
-                />
-                {error && (employeeObj.projectKeyID === null || employeeObj.projectKeyID === undefined || employeeObj.villageKeyID === '') ? (
-                  <span style={{ color: 'red' }}>{ERROR_MESSAGES}</span>
-                ) : (
-                  ''
-                )}
-              </div>
+
+
 
 
             </div>
