@@ -18,7 +18,7 @@ import { ERROR_MESSAGES } from 'component/GlobalMassage';
 import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { AddUpdateAppUser } from 'services/Employee Staff/EmployeeApi';
-import { GetAdminUserModel, GetCompanyLookupList, GetRoleLookupList } from 'services/Company/CompanyApi';
+import { AddUpdateAdminUser, GetAdminUserModel, GetCompanyLookupList, GetRoleLookupList } from 'services/Company/CompanyApi';
 
 const AdminEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDone, modelRequestData, }) => {
       const [customerOption, setCustomerOption] = useState([]);
@@ -200,17 +200,17 @@ const AdminEmployeeAddUpdateModal = ({ show, onHide, setIsAddUpdateActionDone, m
 
       const AddUpdateAppUserData = async (apiParam) => {
             try {
-                  let url = '/AddUpdateAppUser'; // Default URL for Adding Data
+                  let url = '/AddUpdateAdminUser'; // Default URL for Adding Data
 
-                  const response = await AddUpdateAppUser(url, apiParam);
+                  const response = await AddUpdateAdminUser(url, apiParam);
                   if (response) {
                         if (response?.data?.statusCode === 200) {
 
                               setShowSuccessModal(true);
                               setModelAction(
                                     modelRequestData.Action === null || modelRequestData.Action === undefined
-                                          ? 'Employee Added Successfully!'
-                                          : ' Employee Updated Successfully!'
+                                          ? 'Admin Employee Added Successfully!'
+                                          : ' Admin Employee Updated Successfully!'
                               ); //Do not change this naming convention
 
                               setIsAddUpdateActionDone(true);

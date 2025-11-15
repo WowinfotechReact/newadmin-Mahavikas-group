@@ -306,8 +306,8 @@ const AdminEmployeeList = () => {
                                                       <th className="text-center"> Employee Info</th>
 
                                                       <th className="text-center">Address </th>
-                                                      <th className="text-center">Company </th>
-                                                      <th className="text-center actionSticky">Action</th>
+                                                      <th className="text-center">Role  </th>
+                                                      <th className="text-center ">Action</th>
                                                 </tr>
                                           </thead>
                                           <tbody>
@@ -341,7 +341,7 @@ const AdminEmployeeList = () => {
                                                             </td>
 
                                                             <td className='text-center'>
-                                                                  {row.companyName}
+                                                                  {row.roleName}
                                                             </td>
 
 
@@ -349,10 +349,10 @@ const AdminEmployeeList = () => {
 
 
                                                             {/* <td className="text-center">{row.createdOnDate ? dayjs(row.createdOnDate).format('DD/MM/YYYY') : '-'}</td> */}
-                                                            <td className="text-center relative  actionColSticky " style={{ zIndex: 4 }}>
+                                                            <td className="text-center relative"  >
 
                                                                   <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                                                                        <Tooltip title="Update Institute     ">
+                                                                        <Tooltip title="Update Admin Employee">
                                                                               <button
                                                                                     style={{
                                                                                           padding: '4px 8px',
